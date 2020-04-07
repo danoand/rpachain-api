@@ -9,18 +9,19 @@ import (
 var router *gin.Engine
 
 // initRoutes initializes API routes
-func initRoutes() {
+func initRoutes(hndlr *handlers.HandlerEnv) {
 
 	apiv1 := router.Group("/api/v1")
 	{
-		apiv1.GET("/status", handlers.Status)
+		apiv1.GET("/status", hndlr.Status)
+		apiv2.POST("/blockwrite", hndlr.BlockWrite)
 	}
 }
 
 // SetupRouter creates a router for use downstream
-func SetupRouter() *gin.Engine {
+func SetupRouter(hndlr *handlers.HandlerEnv) *gin.Engine {
 	router = gin.Default()
-	initRoutes()
+	initRoutes(hndlr)
 
 	return router
 }

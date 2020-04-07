@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/danoand/utils"
@@ -10,7 +9,7 @@ import (
 
 // Specification houses configuration variables sourced from environment variables
 type Specification struct {
-	MGDBURLString string `default:"mongodb+srv://dbGotomateDev:%v@cluster0-6uy29.mongodb.net/test?retryWrites=true&w=majority"`
+	MGDBURLString string `default:"mongodb+srv://dbdevuser:%v@cluster0-6uy29.mongodb.net/test?retryWrites=true&w=majority"`
 	MGDBPassword  string `required:"true"`
 }
 
@@ -23,11 +22,4 @@ func init() {
 	if err != nil {
 		log.Fatalf("FATAL: %v - error importing environment variables. See: %v\n", utils.FileLine(), err)
 	}
-}
-
-// DbCredentials from env or dev defaults
-func DbCredentials() map[string]string {
-	m := map[string]string{"url": fmt.Sprintf(Cfg.MGDBURLString, Cfg.MGDBPassword)}
-
-	return m
 }
