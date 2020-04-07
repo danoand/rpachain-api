@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"log"
 	"net/http"
 	"time"
@@ -9,7 +8,6 @@ import (
 	"github.com/danoand/utils"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/gin-gonic/gin"
-	"github.com/globalsign/mgo/bson"
 	"github.com/tidwall/pretty"
 )
 
@@ -24,6 +22,8 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	var err error
 	var reqBytes, jBytes []byte
 	var gotoMetaMap = make(map[string]interface{})
+	var gotoDataMap = make(map[string]interface{})
+	var wrapMap = make(map[string]interface{})
 	var tmpMap = make(map[string]interface{})
 	var errMap = make(map[string]string)
 
@@ -76,7 +76,7 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	fileHash := GenNewKeccak256(jBytes)
 	gotoMetaMap["filehash"] = fileHash
 
-	// Hash the gotomate meta data map
+	// Hash the gotomate data map
 	_, jBytes, err = utils.ToJSON(gotoMetaMap)
 	if err != nil {
 		// error encoding the gotomate meta data map
@@ -89,33 +89,17 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		return
 	}
 	mapHash := GenNewKeccak256(jBytes)
+	gotoDataMap["data_hash"] = mapHash
+	gotoDataMap["data_json"] = string(jBytes)
 
+	// Assemble the whole JSON object (meta data and hashed data)
+	wrapMap["gotomate_meta"] = gotoMetaMap
+	wrapMap["gotomate_data"] = gotoDataMap
 
-	// Create a string timestamp
-	str := time.Now().In(hlr.TimeLocationCT).Format(time.RFC3339)
+	// Hash this entire package
+	_, dataBytes, err := utils.ToJSON(wrapMap)
+	dataHash := GenNewKeccak256(dataBytes)
 
-	// Execute a round trip to the database
-	ctx, cncl := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cncl()
+	// TODO: Call the smart contract (assume I can do this programmatically)
 
-	// Execute update
-	_, err = hlr.CollStatus.UpdateOne(
-		ctx,
-		bson.M{"type": "status"},
-		bson.M{"$set": bson.M{"timestamp": str}})
-	if err != nil {
-		// error occurred writing during a db round trip transaction
-		log.Printf("ERROR: %v - error occurred writing during a db round trip transaction. See: %v\n",
-			utils.FileLine(),
-			err)
-
-		c.JSON(500, gin.H{
-			"message": "error occurred accessing the database",
-		})
-		return
-	}
-
-	c.JSON(200, gin.H{
-		"message": "StatusOK",
-	})
 }

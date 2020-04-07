@@ -1,0 +1,52 @@
+[
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "hsh",
+        "type": "string"
+      },
+      {
+        "name": "go_ref",
+        "type": "string"
+      },
+      {
+        "name": "cust_ref",
+        "type": "string"
+      }
+    ],
+    "name": "postObj",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "logHash",
+        "type": "string"
+      },
+      {
+        "indexed": true,
+        "name": "logGoRef",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "name": "logCustRef",
+        "type": "string"
+      }
+    ],
+    "name": "LogVal",
+    "type": "event"
+  }
+]
