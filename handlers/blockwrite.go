@@ -19,11 +19,13 @@ import (
 
 // BlockWrite invoke a smart contract to write a hash to the EVM log and add data file to the IPFS
 func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
-	var err error
-	var mnfst hash.Manifest
-	var reqBytes []byte
-	var errMap = make(map[string]string)
-	var rspMap = make(map[string]interface{})
+	var (
+		err      error
+		mnfst    hash.Manifest
+		reqBytes []byte
+		errMap   = make(map[string]string)
+		rspMap   = make(map[string]interface{})
+	)
 
 	// Fetch the request body
 	reqBytes, err = c.GetRawData()
