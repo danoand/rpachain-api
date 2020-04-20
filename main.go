@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/danoand/gotomate-api/config"
@@ -11,6 +12,7 @@ import (
 	"github.com/danoand/gotomate-api/routes"
 	"github.com/danoand/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/gochain/web3"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -49,11 +51,21 @@ func main() {
 	}
 	hndlr.Database = hndlr.Client.Database("gotomate-dev")
 	hndlr.CollStatus = hndlr.Database.Collection("status")
+	// Create an object dialing the GoChain network
+	hndlr.GoChainNetwork, err = web3.Dial(config.Cfg.GoChainURL)
+	if err != nil {
+		// error dialing the GoChain network/blockchain
+		log.Printf("ERROR: %v - error dialing the GoChain testnet network/blockchain. See: %v\n",
+			utils.FileLine(),
+			err)
+
+		os.Exit(1)
+	}
 
 	// Stand up the gin based server
 	gin.SetMode(gin.TestMode)
 	router := routes.SetupRouter(&hndlr)
 
-	log.Printf("INFO: %v - start up the web server\n", utils.FileLine())
+	log.Printf("INFO: %v - start up the web server on localhost:8080\n", utils.FileLine())
 	router.Run("localhost:8080")
 }

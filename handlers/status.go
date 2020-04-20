@@ -10,7 +10,7 @@ import (
 	"github.com/globalsign/mgo/bson"
 )
 
-// Status: return ok if the web server is up
+// Status returns ok if the web server is up
 func (hlr *HandlerEnv) Status(c *gin.Context) {
 	var err error
 
