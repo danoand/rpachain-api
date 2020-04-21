@@ -51,6 +51,7 @@ func main() {
 	}
 	hndlr.Database = hndlr.Client.Database("gotomate-dev")
 	hndlr.CollStatus = hndlr.Database.Collection("status")
+	hndlr.CollBlockWrites = hndlr.Database.Collection("blockwrites")
 	// Create an object dialing the GoChain network
 	hndlr.GoChainNetwork, err = web3.Dial(config.Cfg.GoChainURL)
 	if err != nil {

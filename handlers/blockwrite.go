@@ -151,6 +151,9 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		return
 	}
 
+	// Log blockwrite data to the database
+	go hlr.logblockwrite(fmt.Sprintf("0x%x", txnSC.Hash), mnfst, txnSC, "")
+
 	rspMap["msg"] = "hash written to the blockchain"
 	rspMap["txnid"] = fmt.Sprintf("0x%x", txnSC.Hash)
 	c.JSON(http.StatusOK, rspMap)
