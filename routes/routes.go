@@ -1,15 +1,19 @@
 package routes
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
 
+	"github.com/danoand/gotomate-api/config"
 	"github.com/danoand/gotomate-api/handlers"
+	"github.com/danoand/utils"
 )
 
 var router *gin.Engine
 
-// initRoutes initializes API routes
-func initRoutes(hndlr *handlers.HandlerEnv) {
+// initStandardRoutes initializes API and related routes enabling the standard web application
+func initStandardRoutes(hndlr *handlers.HandlerEnv) {
 
 	apiv1 := router.Group("/api/v1")
 	{
@@ -21,7 +25,19 @@ func initRoutes(hndlr *handlers.HandlerEnv) {
 // SetupRouter creates a router for use downstream
 func SetupRouter(hndlr *handlers.HandlerEnv) *gin.Engine {
 	router = gin.Default()
-	initRoutes(hndlr)
+
+	// Standard app instance? (ie. not a Faktory instance)
+	if !config.Cfg.IsWorkerInstance {
+		// not a worker instance... configure the standard web service routes
+		log.Printf("INFO: %v - setting up standard web service routes\n", utils.FileLine())
+		initStandardRoutes(hndlr)
+	}
+
+	if config.Cfg.IsWorkerInstance {
+		// set up a worker instance... configure the worker routes
+		log.Printf("INFO: %v - setting up standard web service routes\n", utils.FileLine())
+		// TODO: add a function here to stand up worker routes
+	}
 
 	return router
 }
