@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/danoand/gotomate-api/config"
-	"github.com/danoand/gotomate-api/hash"
+	"github.com/danoand/rpachain-api/config"
+	"github.com/danoand/rpachain-api/hash"
 	"github.com/globalsign/mgo/bson"
 	"github.com/gochain/web3"
 

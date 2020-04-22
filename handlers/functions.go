@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/danoand/gotomate-api/hash"
-	"github.com/danoand/gotomate-api/models"
+	"github.com/danoand/rpachain-api/hash"
+	"github.com/danoand/rpachain-api/models"
 	"github.com/danoand/utils"
 	"github.com/globalsign/mgo/bson"
 	"github.com/gochain/web3"

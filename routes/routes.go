@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/danoand/gotomate-api/config"
-	"github.com/danoand/gotomate-api/handlers"
+	"github.com/danoand/rpachain-api/config"
+	"github.com/danoand/rpachain-api/handlers"
 	"github.com/danoand/utils"
 )
 

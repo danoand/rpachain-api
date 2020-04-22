@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/danoand/gotomate-api/hash"
+	"github.com/danoand/rpachain-api/hash"
 	"github.com/globalsign/mgo/bson"
 	"github.com/gochain/web3"
 )

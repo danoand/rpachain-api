@@ -1,6 +1,6 @@
 pragma solidity ^0.5.7;
 
-// BlockWriteSimple logs gotomate hash data to the GoChain blockchain memorializing data
+// BlockWriteSimple logs rpachain hash data to the GoChain blockchain memorializing data
 contract BlockWriteSimple {
    address owner;
 
@@ -13,7 +13,7 @@ contract BlockWriteSimple {
     function postObj(string memory hsh, string memory go_ref, string memory cust_ref) public {
         require(owner == msg.sender, "calling address must be the contract owner/EOA");
         require(bytes(hsh).length != 0, "error: empty hash value");
-        require(bytes(go_ref).length != 0, "error: empty gotomate reference value");
+        require(bytes(go_ref).length != 0, "error: empty rpachain reference value");
 
         emit LogVal(hsh, go_ref, cust_ref);
 

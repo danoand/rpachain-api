@@ -7,9 +7,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/danoand/gotomate-api/config"
-	"github.com/danoand/gotomate-api/handlers"
-	"github.com/danoand/gotomate-api/routes"
+	"github.com/danoand/rpachain-api/config"
+	"github.com/danoand/rpachain-api/handlers"
+	"github.com/danoand/rpachain-api/routes"
 	"github.com/danoand/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gochain/web3"
@@ -49,7 +49,7 @@ func main() {
 		// error loading a timezone
 		log.Fatalf("FATAL: %v - error loading a timezone. See: %v\n", utils.FileLine(), err)
 	}
-	hndlr.Database = hndlr.Client.Database("gotomate-dev")
+	hndlr.Database = hndlr.Client.Database("rpachain-dev")
 	hndlr.CollStatus = hndlr.Database.Collection("status")
 	hndlr.CollBlockWrites = hndlr.Database.Collection("blockwrites")
 	// Create an object dialing the GoChain network
