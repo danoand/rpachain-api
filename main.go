@@ -13,6 +13,7 @@ import (
 	"github.com/danoand/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gochain/web3"
+	"github.com/minio/minio-go"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -57,6 +58,20 @@ func main() {
 	if err != nil {
 		// error dialing the GoChain network/blockchain
 		log.Printf("ERROR: %v - error dialing the GoChain testnet network/blockchain. See: %v\n",
+			utils.FileLine(),
+			err)
+
+		os.Exit(1)
+	}
+	// Create a client object referencing the Spaces instance
+	hndlr.SpacesClient, err = minio.New(
+		"nyc3.digitaloceanspaces.com",
+		config.Cfg.SpacesAccessKey,
+		config.Cfg.SpacesSecretKey,
+		true)
+	if err != nil {
+		// error establishing a client referencing the Spaces instance
+		log.Printf("ERROR: %v - error establishing a client referencing the Spaces instance. See: %v\n",
 			utils.FileLine(),
 			err)
 

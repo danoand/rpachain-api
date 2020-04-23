@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/gochain/web3"
+	"github.com/minio/minio-go"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/gridfs"
 )
@@ -17,4 +18,5 @@ type HandlerEnv struct {
 	CollStatus      *mongo.Collection
 	CollBlockWrites *mongo.Collection
 	GoChainNetwork  web3.Client
+	SpacesClient    *minio.Client
 }
