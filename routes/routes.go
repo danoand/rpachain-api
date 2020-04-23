@@ -19,6 +19,7 @@ func initStandardRoutes(hndlr *handlers.HandlerEnv) {
 	{
 		apiv1.GET("/status", hndlr.Status)
 		apiv1.POST("/blockwrite", hndlr.BlockWrite)
+		apiv1.POST("/blockwritefiles", hndlr.BlockWriteFiles)
 	}
 }
 
