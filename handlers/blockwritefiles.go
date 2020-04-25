@@ -23,14 +23,37 @@ import (
 // BlockWriteFiles hashes request files and writes the manifest hash to the blockchain
 func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 	var (
-		err   error
-		mnfst hash.Manifest
+		err    error
+		ok     bool
+		dcVal  interface{}
+		custid string
+		mnfst  hash.Manifest
 		// reqBytes []byte
 		errMap = make(map[string]string)
 		rspMap = make(map[string]interface{})
 	)
 
 	mnfst.MetaData = make(map[string]interface{})
+
+	// Get the customer document id from the gin context
+	dcVal, ok = c.Get(config.Consts["cxtCustomerIDKey"])
+	if !ok {
+		// missing customer document id
+		log.Printf("ERROR: %v - missing customer document id\n", utils.FileLine())
+
+		errMap["msg"] = "an error occurred"
+		c.JSON(http.StatusBadRequest, errMap)
+	}
+	custid, ok = dcVal.(string)
+	if !ok {
+		// unexpected parameter type - expecting a string
+		log.Printf("ERROR: %v - unexpected parameter type - expecting a string: %v\n",
+			utils.FileLine(),
+			dcVal)
+
+		errMap["msg"] = "an error occurred"
+		c.JSON(http.StatusBadRequest, errMap)
+	}
 
 	// Set up a Blake3 "hasher"
 	blk3hshr := blake3.New(256, nil)
@@ -52,7 +75,7 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 	}
 
 	// Update the hash manifest
-	mnfst.ID = bson.NewObjectId().Hex()
+	mnfst.RequestID = bson.NewObjectId().Hex()
 	mnfst.TimeStamp = time.Now().In(hlr.TimeLocationCT).Format(time.RFC3339)
 	mnfst.MetaData["customer_reference"] = custRef
 
@@ -75,7 +98,7 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 		filename := filepath.Base(file.Filename)
 
 		// Construct the upload filename
-		updFname := fmt.Sprintf("%v_%v", mnfst.ID, filename)
+		updFname := fmt.Sprintf("%v_%v", mnfst.RequestID, filename)
 
 		// Open the file for reading
 		rdFile, err := file.Open()
@@ -215,7 +238,7 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 		"postObj",
 		0,
 		"<cust_id>",
-		mnfst.ID,
+		mnfst.RequestID,
 		fmt.Sprintf("%x", mnsum[:32]),
 	)
 	if err != nil {
@@ -231,7 +254,13 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 	}
 
 	// Log blockwrite data to the database
-	go hlr.logblockwrite(fmt.Sprintf("0x%x", txnSC.Hash), mnfst, fmtTxn(txnSC), "")
+	go hlr.logblockwrite(
+		custid,
+		mnfst.RequestID,
+		mnfst,
+		fmt.Sprintf("%x", mnsum[:32]),
+		fmtTxn(txnSC),
+		make(map[string]interface{}))
 
 	rspMap["msg"] = "hash written to the blockchain"
 	rspMap["txnid"] = fmt.Sprintf("0x%x", txnSC.Hash)

@@ -21,11 +21,34 @@ import (
 func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	var (
 		err      error
+		ok       bool
+		dcVal    interface{}
+		custid   string
 		mnfst    hash.Manifest
 		reqBytes []byte
 		errMap   = make(map[string]string)
 		rspMap   = make(map[string]interface{})
 	)
+
+	// Get the customer document id from the gin context
+	dcVal, ok = c.Get(config.Consts["cxtCustomerIDKey"])
+	if !ok {
+		// missing customer document id
+		log.Printf("ERROR: %v - missing customer document id\n", utils.FileLine())
+
+		errMap["msg"] = "an error occurred"
+		c.JSON(http.StatusBadRequest, errMap)
+	}
+	custid, ok = dcVal.(string)
+	if !ok {
+		// unexpected parameter type - expecting a string
+		log.Printf("ERROR: %v - unexpected parameter type - expecting a string: %v\n",
+			utils.FileLine(),
+			dcVal)
+
+		errMap["msg"] = "an error occurred"
+		c.JSON(http.StatusBadRequest, errMap)
+	}
 
 	// Fetch the request body
 	reqBytes, err = c.GetRawData()
@@ -70,7 +93,7 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	hshStr := fmt.Sprintf("%x", hsh[:32])
 
 	// Update the hash manifest
-	mnfst.ID = bson.NewObjectId().Hex()
+	mnfst.RequestID = bson.NewObjectId().Hex()
 	mnfst.TimeStamp = time.Now().In(hlr.TimeLocationCT).Format(time.RFC3339)
 	tMap := make(map[string]interface{})
 	tMap[hshStr] = "see file" // TODO: change this value?
@@ -136,7 +159,7 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		"postObj",
 		0,
 		"<cust_id>",
-		mnfst.ID,
+		mnfst.RequestID,
 		fmt.Sprintf("%x", mnsum[:32]),
 	)
 	if err != nil {
@@ -152,7 +175,13 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	}
 
 	// Log blockwrite data to the database
-	go hlr.logblockwrite(fmt.Sprintf("0x%x", txnSC.Hash), mnfst, fmtTxn(txnSC), "")
+	go hlr.logblockwrite(
+		custid,
+		mnfst.RequestID,
+		mnfst,
+		fmt.Sprintf("%x", mnsum[:32]),
+		fmtTxn(txnSC),
+		make(map[string]interface{}))
 
 	rspMap["msg"] = "hash written to the blockchain"
 	rspMap["txnid"] = fmt.Sprintf("0x%x", txnSC.Hash)
