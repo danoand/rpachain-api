@@ -16,7 +16,7 @@ type Specification struct {
 	GoCntrtLogAddr      string `default:"0x30F7F8A09fAB59299588CceF5d410e99CeaAD9C8"`
 	SpacesAccessKey     string `required:"true"`
 	SpacesSecretKey     string `required:"true"`
-	WrkIsWorkerInstance bool   `default:"true"` // indicates if this instance is a worker (as opposed to api instance)
+	WrkIsWorkerInstance bool   `default:"false"` // indicates if this instance is a worker (as opposed to api instance)
 }
 
 // Cfg contains the environment variable information read from the execution environment
