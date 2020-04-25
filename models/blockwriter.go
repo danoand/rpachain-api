@@ -1,9 +1,5 @@
 package models
 
-import (
-	"github.com/danoand/rpachain-api/models"
-)
-
 // BlockWrite models the output of block write to the blockchain
 type BlockWrite struct {
 	ID               string            `json:"id"`               // unique id
@@ -14,6 +10,6 @@ type BlockWrite struct {
 	ContractAddress  string            `json:"contractaddress"`  // blockchain contract address
 	TransactionHash  string            `json:"transactionhash"`  // blockchain transaction hash
 	ManifestHash     string            `json:"manifesthash"`     // overall hash (of manifest document) written to block log
-	Manifest         models.Manifest   `json:"manifest"`         // txn manifest
+	Manifest         Manifest          `json:"manifest"`         // txn manifest
 	BlockTransaction map[string]string `json:"blocktransaction"` // block txn execution data
 }
