@@ -179,9 +179,10 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		custid,
 		mnfst.RequestID,
 		mnfst,
-		fmt.Sprintf("%x", mnsum[:32]),
+		fmt.Sprintf("0x%x", mnsum[:32]),
+		fmt.Sprintf("0x%x", txnSC.Hash),
 		fmtTxn(txnSC),
-		make(map[string]interface{}))
+		utils.FileName())
 
 	rspMap["msg"] = "hash written to the blockchain"
 	rspMap["txnid"] = fmt.Sprintf("0x%x", txnSC.Hash)

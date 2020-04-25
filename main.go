@@ -64,6 +64,8 @@ func main() {
 		os.Exit(1)
 	}
 	hndlr.GoChainNetworkString = config.Cfg.GoChainURL
+	// Assign contract address from environment variable
+	hndlr.GoChainCntrAddrLogHash = config.Cfg.GoCntrtLogAddr
 	// Create a client object referencing the Spaces instance
 	hndlr.SpacesClient, err = minio.New(
 		"nyc3.digitaloceanspaces.com",

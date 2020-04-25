@@ -12,4 +12,5 @@ type BlockWrite struct {
 	ManifestHash     string            `json:"manifesthash"`     // overall hash (of manifest document) written to block log
 	Manifest         Manifest          `json:"manifest"`         // txn manifest
 	BlockTransaction map[string]string `json:"blocktransaction"` // block txn execution data
+	Function         string            `json:"function"`         // name of the go function executing the block txn
 }

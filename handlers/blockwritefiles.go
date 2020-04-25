@@ -58,9 +58,6 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 	// Set up a Blake3 "hasher"
 	blk3hshr := blake3.New(256, nil)
 
-	// Process a multipart form style request
-	custRef := c.PostForm("ref") // sample: capture a reference number
-
 	// Parse the multi-part request
 	form, err := c.MultipartForm()
 	if err != nil {
@@ -77,7 +74,6 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 	// Update the hash manifest
 	mnfst.RequestID = bson.NewObjectId().Hex()
 	mnfst.TimeStamp = time.Now().In(hlr.TimeLocationCT).Format(time.RFC3339)
-	mnfst.MetaData["customer_reference"] = custRef
 
 	// Grab the set of files
 	files := form.File["files"]
@@ -258,9 +254,10 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 		custid,
 		mnfst.RequestID,
 		mnfst,
-		fmt.Sprintf("%x", mnsum[:32]),
+		fmt.Sprintf("0x%x", mnsum[:32]),
+		fmt.Sprintf("0x%x", txnSC.Hash),
 		fmtTxn(txnSC),
-		make(map[string]interface{}))
+		utils.FileName())
 
 	rspMap["msg"] = "hash written to the blockchain"
 	rspMap["txnid"] = fmt.Sprintf("0x%x", txnSC.Hash)

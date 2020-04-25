@@ -16,8 +16,9 @@ func (hlr *HandlerEnv) logblockwrite(
 	reqid string,
 	mnfst models.Manifest,
 	hsh string,
+	txnhsh string,
 	txn map[string]string,
-	custref map[string]interface{}) {
+	funktion string) {
 
 	var (
 		err error
@@ -28,12 +29,15 @@ func (hlr *HandlerEnv) logblockwrite(
 	obj.ID = bson.NewObjectId().Hex()
 	obj.CustomerID = custid
 	obj.ChainNetwork = hlr.GoChainNetworkString
+	obj.ContractAddress = hlr.GoChainCntrAddrLogHash
 	obj.RequestID = reqid
 	obj.TimeStamp = time.Now().In(hlr.TimeLocationCT).Format(time.RFC3339)
 	obj.RequestID = mnfst.RequestID
 	obj.Manifest = mnfst
-	obj.TransactionHash = hsh
+	obj.ManifestHash = hsh
+	obj.TransactionHash = txnhsh
 	obj.BlockTransaction = txn
+	obj.Function = funktion
 
 	// Insert log document into the database
 	_, err = hlr.CollBlockWrites.InsertOne(context.TODO(), obj)
