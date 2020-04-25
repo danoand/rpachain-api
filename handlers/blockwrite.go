@@ -76,7 +76,7 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	tMap[hshStr] = "see file" // TODO: change this value?
 	mnfst.Contents = append(mnfst.Contents, tMap)
 
-	// Encode manifest as bson
+	// Encode manifest as json
 	_, mnbytes, err := utils.ToJSON(mnfst)
 	if err != nil {
 		// error encoding the manifest object as json bytes
@@ -152,7 +152,7 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	}
 
 	// Log blockwrite data to the database
-	go hlr.logblockwrite(fmt.Sprintf("0x%x", txnSC.Hash), mnfst, txnSC, "")
+	go hlr.logblockwrite(fmt.Sprintf("0x%x", txnSC.Hash), mnfst, fmtTxn(txnSC), "")
 
 	rspMap["msg"] = "hash written to the blockchain"
 	rspMap["txnid"] = fmt.Sprintf("0x%x", txnSC.Hash)

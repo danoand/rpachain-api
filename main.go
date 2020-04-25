@@ -45,7 +45,7 @@ func main() {
 	tmpcancel()
 
 	// Configure handler object
-	hndlr.TimeLocationCT, err = time.LoadLocation("America/Chicago")
+	hndlr.TimeLocationCT, err = time.LoadLocation(config.Consts["timezone"])
 	if err != nil {
 		// error loading a timezone
 		log.Fatalf("FATAL: %v - error loading a timezone. See: %v\n", utils.FileLine(), err)
@@ -63,6 +63,7 @@ func main() {
 
 		os.Exit(1)
 	}
+	hndlr.GoChainNetwork = config.Cfg.GoChainURL
 	// Create a client object referencing the Spaces instance
 	hndlr.SpacesClient, err = minio.New(
 		"nyc3.digitaloceanspaces.com",

@@ -2,8 +2,9 @@ package hash
 
 // Manifest models a description of data to memorialized
 type Manifest struct {
-	ID        string                   `bson:"id" json:"id"`
-	TimeStamp string                   `bson:"timestamp" json:"timestamp"`
-	MetaData  map[string]interface{}   `bson:"metadata" json:"metadata"`
-	Contents  []map[string]interface{} `bson:"contents" json:"contents"`
+	RequestID         string                   `json:"id"`                // request id
+	TimeStamp         string                   `json:"timestamp"`         // timestamp
+	MetaData          map[string]interface{}   `json:"metadata"`          // general meta data
+	Contents          []map[string]interface{} `json:"contents"`          // filenames and associated hashes
+	CustomerReference map[string]interface{}   `json:"customerreference"` // general customer reference
 }
