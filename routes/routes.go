@@ -29,16 +29,10 @@ func SetupRouter(hndlr *handlers.HandlerEnv) *gin.Engine {
 	router = gin.Default()
 
 	// Standard app instance? (ie. not a Faktory instance)
-	if !config.Cfg.IsWorkerInstance {
+	if !config.Cfg.WrkIsWorkerInstance {
 		// not a worker instance... configure the standard web service routes
 		log.Printf("INFO: %v - setting up standard web service routes\n", utils.FileLine())
 		initStandardRoutes(hndlr)
-	}
-
-	if config.Cfg.IsWorkerInstance {
-		// set up a worker instance... configure the worker routes
-		log.Printf("INFO: %v - setting up standard web service routes\n", utils.FileLine())
-		// TODO: add a function here to stand up worker routes
 	}
 
 	return router

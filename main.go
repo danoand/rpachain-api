@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	wrk "github.com/contribsys/faktory_worker_go"
 	"github.com/danoand/rpachain-api/config"
 	"github.com/danoand/rpachain-api/handlers"
 	"github.com/danoand/rpachain-api/routes"
@@ -79,6 +80,22 @@ func main() {
 			err)
 
 		os.Exit(1)
+	}
+
+	// *******************************
+	// Configure worker instance information
+	if config.Cfg.WrkIsWorkerInstance {
+		// this execution app instance is a worker instance
+		// register worker functions (job handlers)
+		log.Printf("INFO: %v - setting up worker functions\n", utils.FileLine())
+
+		hndlr.FaktoryClient = wrk.NewManager()
+		hndlr.FaktoryClient.Register("TestFunktion", hndlr.TestFunktion)
+		hndlr.FaktoryClient.Concurrency = 10
+		hndlr.FaktoryClient.ProcessStrictPriorityQueues("rpa_high", "rpa_default")
+
+		log.Printf("INFO: %v - starting Faktory job processing\n", utils.FileLine())
+		go hndlr.FaktoryClient.Run() // start listener for Faktory jobs in a go routine
 	}
 
 	// Stand up the gin based server

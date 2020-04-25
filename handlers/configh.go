@@ -7,6 +7,8 @@ import (
 	"github.com/minio/minio-go"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/gridfs"
+
+	wrk "github.com/contribsys/faktory_worker_go"
 )
 
 // HandlerEnv houses config data needed for route handler execution
@@ -19,6 +21,7 @@ type HandlerEnv struct {
 	CollBlockWrites        *mongo.Collection
 	GoChainNetwork         web3.Client
 	GoChainNetworkString   string
-	GoChainCntrAddrLogHash string // address of contract
-	SpacesClient           *minio.Client
+	GoChainCntrAddrLogHash string        // address of contract
+	SpacesClient           *minio.Client //
+	FaktoryClient          *wrk.Manager  // Faktory client manager
 }
