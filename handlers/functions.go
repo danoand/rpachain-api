@@ -5,7 +5,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/danoand/rpachain-api/hash"
 	"github.com/danoand/rpachain-api/models"
 	"github.com/danoand/utils"
 	"github.com/globalsign/mgo/bson"
@@ -15,7 +14,7 @@ import (
 func (hlr *HandlerEnv) logblockwrite(
 	custid string,
 	reqid string,
-	mnfst hash.Manifest,
+	mnfst models.Manifest,
 	hsh string,
 	txn map[string]string,
 	custref map[string]interface{}) {

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/danoand/rpachain-api/config"
-	"github.com/danoand/rpachain-api/hash"
+	"github.com/danoand/rpachain-api/models"
 	"github.com/globalsign/mgo/bson"
 	"github.com/gochain/web3"
 	"github.com/minio/minio-go"
@@ -27,7 +27,7 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 		ok     bool
 		dcVal  interface{}
 		custid string
-		mnfst  hash.Manifest
+		mnfst  models.Manifest
 		// reqBytes []byte
 		errMap = make(map[string]string)
 		rspMap = make(map[string]interface{})

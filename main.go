@@ -63,7 +63,7 @@ func main() {
 
 		os.Exit(1)
 	}
-	hndlr.GoChainNetwork = config.Cfg.GoChainURL
+	hndlr.GoChainNetworkString = config.Cfg.GoChainURL
 	// Create a client object referencing the Spaces instance
 	hndlr.SpacesClient, err = minio.New(
 		"nyc3.digitaloceanspaces.com",

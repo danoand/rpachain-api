@@ -1,4 +1,4 @@
-package hash
+package models
 
 // Manifest models a description of data to memorialized
 type Manifest struct {

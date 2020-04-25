@@ -16,7 +16,7 @@ func APIAuth() gin.HandlerFunc {
 
 		// Set example variable
 		c.Set(config.Consts["cxtCustomerIDKey"], config.Consts["stub_custid"]) // string
-		log.Prtinf("DEBUG: %v - setting a stub customer document id of: %v\n",
+		log.Printf("DEBUG: %v - setting a stub customer document id of: %v\n",
 			utils.FileLine(),
 			config.Consts["stub_custid"])
 
