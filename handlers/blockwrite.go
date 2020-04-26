@@ -158,9 +158,9 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		config.Cfg.GoChainPrivKey,
 		"postObj",
 		0,
-		"<cust_id>",
-		mnfst.RequestID,
 		fmt.Sprintf("%x", mnsum[:32]),
+		mnfst.RequestID,
+		"N/A",
 	)
 	if err != nil {
 		// error calling the GoChain smart contract

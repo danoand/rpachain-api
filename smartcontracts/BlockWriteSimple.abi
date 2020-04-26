@@ -3,11 +3,11 @@
     "constant": false,
     "inputs": [
       {
-        "name": "hsh",
+        "name": "hash",
         "type": "string"
       },
       {
-        "name": "go_ref",
+        "name": "rpa_chn_ref",
         "type": "string"
       },
       {
@@ -32,17 +32,27 @@
     "inputs": [
       {
         "indexed": true,
-        "name": "logHash",
+        "name": "log_hash",
         "type": "string"
       },
       {
         "indexed": true,
-        "name": "logGoRef",
+        "name": "log_rpa_ref",
         "type": "string"
       },
       {
         "indexed": false,
-        "name": "logCustRef",
+        "name": "log_cust_ref",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "name": "log_hash_str",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "name": "log_rpa_ref_str",
         "type": "string"
       }
     ],
