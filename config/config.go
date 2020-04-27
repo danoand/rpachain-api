@@ -10,6 +10,7 @@ import (
 
 // Specification houses configuration variables sourced from environment variables
 type Specification struct {
+	IsHerokuEnv    bool   `default:"false"`
 	MGDBURLString  string `default:"mongodb+srv://dbdevuser:%v@cluster0-6uy29.mongodb.net/test?retryWrites=true&w=majority"`
 	MGDBPassword   string `required:"true"`
 	GoChainURL     string `default:"https://testnet-rpc.gochain.io/"`

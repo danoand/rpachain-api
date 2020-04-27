@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"archive/tar"
+	"archive/zip"
 	"context"
 	"fmt"
 	"io"
@@ -64,13 +64,14 @@ func (hlr *HandlerEnv) TestFunktion(ctx context.Context, args ...interface{}) er
 	return nil
 }
 
-// TarRequest creates and stores a tar ball of a request's hashed files
-func (hlr *HandlerEnv) TarRequest(ctx context.Context, args ...interface{}) error {
-	var err error
-	var goErr error
-	var ok bool
-	var req mdl.BlockWrite
-	var tw *tar.Writer
+// ZipRequest creates and stores a tar ball of a request's hashed files
+func (hlr *HandlerEnv) ZipRequest(ctx context.Context, args ...interface{}) error {
+	var (
+		err   error
+		goErr error
+		ok    bool
+		req   mdl.BlockWrite
+	)
 
 	help := wrk.HelperFor(ctx)
 
@@ -161,15 +162,33 @@ func (hlr *HandlerEnv) TarRequest(ctx context.Context, args ...interface{}) erro
 	pr, pw := io.Pipe()
 
 	// Define a tar writer
-	tw = tar.NewWriter(pw)
+	zpw := zip.NewWriter(pw)
 
 	// Iterate through the spaces files and send them through the tar "writer"
 	go func() {
 		// Close the pipe and tar writers at the end of the goroutine
 		defer pw.Close()
-		defer tw.Close()
+		defer zpw.Close()
 
 		for _, fname := range fnames {
+
+			// Generate the new filename for zipping purposes
+			//    delete the leading "<document_id>_" prefix
+			fnew := config.RgxFnamePrefix.ReplaceAllString(fname, "")
+
+			// Create a file in which to write the zipped file contents
+			fzip, err := zpw.Create(fnew)
+			if err != nil {
+				// error creating a zip file
+				log.Printf("WRKR: %v - ERROR - %v - error creating a zip file for file: %v. See: %v\n",
+					jid,
+					utils.FileLine(),
+					fnew,
+					err)
+
+				goErr = fmt.Errorf("error creating a zip file for file: %v - %v", fnew, err)
+				break
+			}
 
 			// Create a context for the bucket read
 			ctx1, cancel1 := context.WithTimeout(context.Background(), 240*time.Second)
@@ -190,19 +209,21 @@ func (hlr *HandlerEnv) TarRequest(ctx context.Context, args ...interface{}) erro
 					err)
 
 				goErr = fmt.Errorf("error occurred reading a file: %v from the remote bucket: %v", fname, err)
+				break
 			}
 
-			// Copy the file to the tar writer for processing
-			_, err = io.Copy(tw, object)
+			// Copy the file to the zip file writer for processing
+			_, err = io.Copy(fzip, object)
 			if err != nil {
-				// error occurred tar'ing a file
-				log.Printf("WRKR: %v - ERROR - %v - error occurred tar'ing a file: %v read from the remote bucket. See: %v\n",
+				// error occurred zipping a file
+				log.Printf("WRKR: %v - ERROR - %v - error occurred zipping a file: %v read from the remote bucket. See: %v\n",
 					jid,
 					utils.FileLine(),
 					fname,
 					err)
 
-				goErr = fmt.Errorf("error occurred tar'ing a file: %v from the remote bucket: %v", fname, err)
+				goErr = fmt.Errorf("error occurred zipping a file: %v from the remote bucket: %v", fname, err)
+				break
 			}
 		}
 	}()
@@ -211,24 +232,24 @@ func (hlr *HandlerEnv) TarRequest(ctx context.Context, args ...interface{}) erro
 	ctx2, cancel2 := context.WithTimeout(context.Background(), 240*time.Second)
 	defer cancel2()
 
-	// Write the tar ball file to the remote bucket
+	// Write the zip file to the remote bucket
 	n, err := hlr.SpacesClient.PutObjectWithContext(
 		ctx2,
 		config.Consts["bucket_store"],
-		fmt.Sprintf("%v.tar", docid),
+		fmt.Sprintf("%v.zip", docid),
 		pr,
 		-1,
 		minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
-		// error putting the tar file object to the remote bucket
-		log.Printf("WRKR: %v - ERROR - %v - error putting the tar file object: %v to the remote bucket. See: %v\n",
+		// error putting the zip file object to the remote bucket
+		log.Printf("WRKR: %v - ERROR - %v - error putting the zip file object: %v to the remote bucket. See: %v\n",
 			jid,
 			utils.FileLine(),
-			fmt.Sprintf("%v.tar", docid),
+			fmt.Sprintf("%v.zip", docid),
 			err)
 
-		return fmt.Errorf("error putting the tar file object: %v to the remote bucket: %v",
-			fmt.Sprintf("%v.tar", docid),
+		return fmt.Errorf("error putting the zip file object: %v to the remote bucket: %v",
+			fmt.Sprintf("%v.zip", docid),
 			err)
 	}
 

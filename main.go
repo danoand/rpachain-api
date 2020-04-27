@@ -85,17 +85,22 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Set the localhost port for web api mode
+	port := config.Consts["localport_api"]
+
 	// *******************************
 	// Configure Faktory worker instance information (so this instance can excute worker jobs)
 	if config.Cfg.WrkIsWorkerInstance {
 		// this execution app instance is a worker instance
 		// register worker functions (job handlers)
 		log.Printf("INFO: %v - setting up Faktory worker functions\n", utils.FileLine())
+		// Override the localhost port for worker mode
+		port = config.Consts["localport_wrk"]
 
 		hndlr.FaktoryManager = wrk.NewManager()
 
 		hndlr.FaktoryManager.Register("TestFunktion", hndlr.TestFunktion)
-		hndlr.FaktoryManager.Register("CreateHashTarBallFile", hndlr.TarRequest)
+		hndlr.FaktoryManager.Register("CreateHashTarBallFile", hndlr.ZipRequest)
 
 		hndlr.FaktoryManager.Concurrency = 10
 		hndlr.FaktoryManager.ProcessStrictPriorityQueues("rpa_high", "rpa_default")
@@ -107,7 +112,7 @@ func main() {
 	// Configure Facktory client instance information (so this instance can queue worker jobs)
 	if !config.Cfg.WrkIsWorkerInstance {
 		// this execution app instance is a web instance (and will queue workers)
-		log.Printf("INFO: %v - setting up Faktory queuing instance\n", utils.FileLine())
+		log.Printf("INFO: %v - setting up Faktory queuing instance (in web API mode)\n", utils.FileLine())
 
 		hndlr.FaktoryClient, err = fak.Open()
 		if err != nil {
@@ -118,10 +123,16 @@ func main() {
 		}
 	}
 
+	// In the Heroku environment?
+	if config.Cfg.IsHerokuEnv {
+		// Override the localhost port for execution on Heroku
+		port = fmt.Sprintf(":%v", os.Getenv("PORT"))
+	}
+
 	// Stand up the gin based server
 	gin.SetMode(gin.TestMode)
 	router := routes.SetupRouter(&hndlr)
 
-	log.Printf("INFO: %v - start up the web server on localhost:8080\n", utils.FileLine())
-	router.Run("localhost:8080")
+	log.Printf("INFO: %v - start up the web server on: %v\n", utils.FileLine(), port)
+	router.Run(port)
 }
