@@ -212,7 +212,7 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 	defer cnclSC()
 
 	// Generate an ABI object (for my deployed smart contract) using a file accessed via the web
-	myABIFile := "https://dsfiles.dananderson.dev/files/LogObject.abi" // TODO: don't hardcode this
+	myABIFile := hlr.GoChainCntrABIURL
 	abi, err := web3.GetABI(myABIFile)
 	if err != nil {
 		// error generating an ABI object
@@ -235,9 +235,9 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 		config.Cfg.GoChainPrivKey,
 		"postObj",
 		0,
-		"<cust_id>",
-		mnfst.RequestID,
 		fmt.Sprintf("%x", mnsum[:32]),
+		mnfst.RequestID,
+		"N/A",
 	)
 	if err != nil {
 		// error calling the GoChain smart contract
@@ -267,9 +267,6 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 
 	// TODO: create a manifest json document including the filenames and their respective hashes
 
-	// TODO: now that we have:
-	// TODO:  1. uploaded files stored in the cloud (DO space)
-	// TODO:  2. a Blake3 hash for each file
 	// TODO:  --> create a tarball of each data file and the package manifest
 	// TODO:  --> store that tarball in it's resting place (rpachain storage, IPFS, customer location)
 }

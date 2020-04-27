@@ -22,6 +22,7 @@ type HandlerEnv struct {
 	GoChainNetwork         web3.Client
 	GoChainNetworkString   string
 	GoChainCntrAddrLogHash string        // address of contract
+	GoChainCntrABIURL      string        // web access to smart contract ABI
 	SpacesClient           *minio.Client //
 	FaktoryClient          *wrk.Manager  // Faktory client manager
 }

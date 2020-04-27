@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"log"
@@ -11,6 +12,7 @@ import (
 	"github.com/danoand/rpachain-api/models"
 	"github.com/globalsign/mgo/bson"
 	"github.com/gochain/web3"
+	"github.com/minio/minio-go"
 
 	"github.com/danoand/utils"
 	"github.com/gin-gonic/gin"
@@ -87,6 +89,9 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		return
 	}
 
+	// Create a reader from the request bytes
+	rdr := bytes.NewReader(reqBytes)
+
 	// Generate the hash value
 	hsh := blk3hshr.Sum(nil)
 	// Grab the hex representation of the first 32 bytes
@@ -96,7 +101,7 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	mnfst.RequestID = bson.NewObjectId().Hex()
 	mnfst.TimeStamp = time.Now().In(hlr.TimeLocationCT).Format(time.RFC3339)
 	tMap := make(map[string]interface{})
-	tMap[hshStr] = "see file" // TODO: change this value?
+	tMap[hshStr] = fmt.Sprintf("%v_request_body.dat", mnfst.RequestID)
 	mnfst.Contents = append(mnfst.Contents, tMap)
 
 	// Encode manifest as json
@@ -128,14 +133,37 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	}
 	mnsum := blk3hshr.Sum(nil)
 
-	// Write the hash to the blockchain
+	// Create a context
+	ctx, cancel := context.WithTimeout(context.Background(), 180*time.Second)
+	defer cancel()
 
+	// Write the request body data to a file in the storage bucket
+	_, err = hlr.SpacesClient.PutObjectWithContext(
+		ctx,
+		config.Consts["bucket_uploads"],
+		fmt.Sprintf("%v_request_body.dat", mnfst.RequestID),
+		rdr,
+		int64(rdr.Len()),
+		minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	if err != nil {
+		// error uploading a file to spaces
+		log.Printf("ERROR: %v - error uploading a file to spaces for request: %v. See: %v\n",
+			utils.FileLine(),
+			mnfst.RequestID,
+			err)
+
+		errMap["msg"] = "error saving a file"
+		c.JSON(http.StatusInternalServerError, errMap)
+		return
+	}
+
+	// Write the hash to the blockchain
 	// Call a smart contract
 	ctxSC, cnclSC := context.WithCancel(context.Background())
 	defer cnclSC()
 
 	// Generate an ABI object (for my deployed smart contract) using a file accessed via the web
-	myABIFile := "https://dsfiles.dananderson.dev/files/LogObject.abi" // TODO: don't hardcode this
+	myABIFile := hlr.GoChainCntrABIURL
 	abi, err := web3.GetABI(myABIFile)
 	if err != nil {
 		// error generating an ABI object

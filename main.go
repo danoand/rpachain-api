@@ -67,6 +67,8 @@ func main() {
 	hndlr.GoChainNetworkString = config.Cfg.GoChainURL
 	// Assign contract address from environment variable
 	hndlr.GoChainCntrAddrLogHash = config.Cfg.GoCntrtLogAddr
+	// Assign contract ABI URL (web access)
+	hndlr.GoChainCntrABIURL = config.Cfg.GoCntrtABIURL
 	// Create a client object referencing the Spaces instance
 	hndlr.SpacesClient, err = minio.New(
 		"nyc3.digitaloceanspaces.com",
