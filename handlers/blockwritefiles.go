@@ -156,12 +156,10 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 		hsh := fmt.Sprintf("%x", sum[:32])
 
 		// Save filenames and hashes to the manifest
-		mnfst.Contents = append(
-			mnfst.Contents,
-			map[string]interface{}{
-				"hash":     hsh,
-				"filename": filename,
-			})
+		tMap := make(map[string]string)
+		tMap["hash"] = hsh
+		tMap["filename"] = filename
+		mnfst.Contents = append(mnfst.Contents, tMap)
 
 		// TODO: maybe update the meta data of the file just uploaded to Spaces with
 		// TODO:   .... its hash? Just fire off a goroutine?

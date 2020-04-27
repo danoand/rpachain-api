@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	fak "github.com/contribsys/faktory/client"
 	wrk "github.com/contribsys/faktory_worker_go"
 	"github.com/danoand/rpachain-api/config"
 	"github.com/danoand/rpachain-api/handlers"
@@ -85,19 +86,36 @@ func main() {
 	}
 
 	// *******************************
-	// Configure worker instance information
+	// Configure Faktory worker instance information (so this instance can excute worker jobs)
 	if config.Cfg.WrkIsWorkerInstance {
 		// this execution app instance is a worker instance
 		// register worker functions (job handlers)
-		log.Printf("INFO: %v - setting up worker functions\n", utils.FileLine())
+		log.Printf("INFO: %v - setting up Faktory worker functions\n", utils.FileLine())
 
-		hndlr.FaktoryClient = wrk.NewManager()
-		hndlr.FaktoryClient.Register("TestFunktion", hndlr.TestFunktion)
-		hndlr.FaktoryClient.Concurrency = 10
-		hndlr.FaktoryClient.ProcessStrictPriorityQueues("rpa_high", "rpa_default")
+		hndlr.FaktoryManager = wrk.NewManager()
+
+		hndlr.FaktoryManager.Register("TestFunktion", hndlr.TestFunktion)
+		hndlr.FaktoryManager.Register("CreateHashTarBallFile", hndlr.TarRequest)
+
+		hndlr.FaktoryManager.Concurrency = 10
+		hndlr.FaktoryManager.ProcessStrictPriorityQueues("rpa_high", "rpa_default")
 
 		log.Printf("INFO: %v - starting Faktory job processing\n", utils.FileLine())
-		go hndlr.FaktoryClient.Run() // start listener for Faktory jobs in a go routine
+		go hndlr.FaktoryManager.Run() // start listener for Faktory jobs in a go routine
+	}
+
+	// Configure Facktory client instance information (so this instance can queue worker jobs)
+	if !config.Cfg.WrkIsWorkerInstance {
+		// this execution app instance is a web instance (and will queue workers)
+		log.Printf("INFO: %v - setting up Faktory queuing instance\n", utils.FileLine())
+
+		hndlr.FaktoryClient, err = fak.Open()
+		if err != nil {
+			// error creating a Faktory client
+			log.Fatalf("ERROR: %v - error creating a Faktory client. See: %v\n",
+				utils.FileLine(),
+				err)
+		}
 	}
 
 	// Stand up the gin based server

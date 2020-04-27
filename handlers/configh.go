@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/gridfs"
 
+	fak "github.com/contribsys/faktory/client"
 	wrk "github.com/contribsys/faktory_worker_go"
 )
 
@@ -24,5 +25,6 @@ type HandlerEnv struct {
 	GoChainCntrAddrLogHash string        // address of contract
 	GoChainCntrABIURL      string        // web access to smart contract ABI
 	SpacesClient           *minio.Client //
-	FaktoryClient          *wrk.Manager  // Faktory client manager
+	FaktoryManager         *wrk.Manager  // Faktory worker queue manager (work queued jobs)
+	FaktoryClient          *fak.Client   // Faktory worker client (queue jobs)
 }

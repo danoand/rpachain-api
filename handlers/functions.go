@@ -5,6 +5,8 @@ import (
 	"log"
 	"time"
 
+	fak "github.com/contribsys/faktory/client"
+
 	"github.com/danoand/rpachain-api/models"
 	"github.com/danoand/utils"
 	"github.com/globalsign/mgo/bson"
@@ -46,6 +48,29 @@ func (hlr *HandlerEnv) logblockwrite(
 		log.Printf("ERROR: %v - error writing an object to the database. See: %v\n",
 			utils.FileLine(),
 			err)
+	}
+
+	// Queue a job to create a tar ball
+	job := fak.NewJob("CreateHashTarBallFile", mnfst.RequestID)
+	job.Queue = "rpa_high"
+	job.Custom = map[string]interface{}{"for_requestid": mnfst.RequestID}
+
+	// Push the job to the Faktory instance
+	err = hlr.FaktoryClient.Push(job)
+	if err != nil {
+		// error queuing a job to tar files for a particular request
+		log.Printf("ERROR: %v - error queuing a job to tar files for a particular request: %v. See: %v\n",
+			utils.FileLine(),
+			mnfst.RequestID,
+			err)
+	}
+	if err == nil {
+		// log job queue information
+		log.Printf("INFO: %v - queued tar job: %v [queue: %v] for request: %v\n",
+			utils.FileLine(),
+			job.Jid,
+			job.Queue,
+			mnfst.RequestID)
 	}
 
 	return

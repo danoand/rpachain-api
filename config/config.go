@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"regexp"
 
 	"github.com/danoand/utils"
 	"github.com/kelseyhightower/envconfig"
@@ -18,11 +19,14 @@ type Specification struct {
 	GoCntrtABIURL       string `default:"https://api.cacher.io/raw/b111c7d6e40a12daefbb/293719cb85094bc72614/BlockWriteSample.abi"`
 	SpacesAccessKey     string `required:"true"`
 	SpacesSecretKey     string `required:"true"`
-	WrkIsWorkerInstance bool   `default:"false"` // indicates if this instance is a worker (as opposed to api instance)
+	WrkIsWorkerInstance bool   `default:"true"` // indicates if this instance is a worker (as opposed to api instance)
 }
 
 // Cfg contains the environment variable information read from the execution environment
 var Cfg Specification
+
+// RgxFnamePrefix matches the prefix given to uploaded hashed files
+var RgxFnamePrefix *regexp.Regexp
 
 // Read in environment variable information at initialization time
 func init() {
@@ -30,4 +34,6 @@ func init() {
 	if err != nil {
 		log.Fatalf("FATAL: %v - error importing environment variables. See: %v\n", utils.FileLine(), err)
 	}
+
+	RgxFnamePrefix = regexp.MustCompile(`^[a-f0-9]+_`)
 }

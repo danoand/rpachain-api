@@ -99,9 +99,37 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 
 	// Update the hash manifest
 	mnfst.RequestID = bson.NewObjectId().Hex()
+
+	// Create a context
+	ctx, cancel := context.WithTimeout(context.Background(), 180*time.Second)
+	defer cancel()
+
+	// Write the request body data to a file in the storage bucket
+	_, err = hlr.SpacesClient.PutObjectWithContext(
+		ctx,
+		config.Consts["bucket_uploads"],
+		fmt.Sprintf("%v_request_body.dat", mnfst.RequestID),
+		rdr,
+		int64(rdr.Len()),
+		minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	if err != nil {
+		// error uploading a file to spaces
+		log.Printf("ERROR: %v - error uploading a file to spaces for request: %v. See: %v\n",
+			utils.FileLine(),
+			mnfst.RequestID,
+			err)
+
+		errMap["msg"] = "error saving a file"
+		c.JSON(http.StatusInternalServerError, errMap)
+		return
+	}
+
+	// Update the hash manifest
 	mnfst.TimeStamp = time.Now().In(hlr.TimeLocationCT).Format(time.RFC3339)
-	tMap := make(map[string]interface{})
-	tMap[hshStr] = fmt.Sprintf("%v_request_body.dat", mnfst.RequestID)
+	// Save filenames and hashes to the manifest
+	tMap := make(map[string]string)
+	tMap["hash"] = hshStr
+	tMap["filename"] = fmt.Sprintf("%v_request_body.dat", mnfst.RequestID)
 	mnfst.Contents = append(mnfst.Contents, tMap)
 
 	// Encode manifest as json
@@ -132,30 +160,6 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		return
 	}
 	mnsum := blk3hshr.Sum(nil)
-
-	// Create a context
-	ctx, cancel := context.WithTimeout(context.Background(), 180*time.Second)
-	defer cancel()
-
-	// Write the request body data to a file in the storage bucket
-	_, err = hlr.SpacesClient.PutObjectWithContext(
-		ctx,
-		config.Consts["bucket_uploads"],
-		fmt.Sprintf("%v_request_body.dat", mnfst.RequestID),
-		rdr,
-		int64(rdr.Len()),
-		minio.PutObjectOptions{ContentType: "application/octet-stream"})
-	if err != nil {
-		// error uploading a file to spaces
-		log.Printf("ERROR: %v - error uploading a file to spaces for request: %v. See: %v\n",
-			utils.FileLine(),
-			mnfst.RequestID,
-			err)
-
-		errMap["msg"] = "error saving a file"
-		c.JSON(http.StatusInternalServerError, errMap)
-		return
-	}
 
 	// Write the hash to the blockchain
 	// Call a smart contract
