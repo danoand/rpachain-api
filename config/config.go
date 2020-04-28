@@ -20,7 +20,7 @@ type Specification struct {
 	GoCntrtABIURL       string `default:"https://api.cacher.io/raw/b111c7d6e40a12daefbb/293719cb85094bc72614/BlockWriteSample.abi"`
 	SpacesAccessKey     string `required:"true"`
 	SpacesSecretKey     string `required:"true"`
-	WrkIsWorkerInstance bool   `default:"true"` // indicates if this instance is a worker (as opposed to api instance)
+	WrkIsWorkerInstance bool   `default:"false"` // indicates if this instance is a worker (as opposed to api instance)
 }
 
 // Cfg contains the environment variable information read from the execution environment

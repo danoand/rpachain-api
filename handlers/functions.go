@@ -50,23 +50,24 @@ func (hlr *HandlerEnv) logblockwrite(
 			err)
 	}
 
-	// Queue a job to create a tar ball
+	// Queue a job to create a zip ball
 	job := fak.NewJob("CreateHashTarBallFile", mnfst.RequestID)
 	job.Queue = "rpa_high"
 	job.Custom = map[string]interface{}{"for_requestid": mnfst.RequestID}
+	job.Retry = -1 // don't retry job if it fails
 
 	// Push the job to the Faktory instance
 	err = hlr.FaktoryClient.Push(job)
 	if err != nil {
-		// error queuing a job to tar files for a particular request
-		log.Printf("ERROR: %v - error queuing a job to tar files for a particular request: %v. See: %v\n",
+		// error queuing a job to zip files for a particular request
+		log.Printf("ERROR: %v - error queuing a job to zip files for a particular request: %v. See: %v\n",
 			utils.FileLine(),
 			mnfst.RequestID,
 			err)
 	}
 	if err == nil {
 		// log job queue information
-		log.Printf("INFO: %v - queued tar job: %v [queue: %v] for request: %v\n",
+		log.Printf("INFO: %v - queued zip job: %v [queue: %v] for request: %v\n",
 			utils.FileLine(),
 			job.Jid,
 			job.Queue,

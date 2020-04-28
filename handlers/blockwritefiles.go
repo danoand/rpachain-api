@@ -158,7 +158,7 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 		// Save filenames and hashes to the manifest
 		tMap := make(map[string]string)
 		tMap["hash"] = hsh
-		tMap["filename"] = filename
+		tMap["filename"] = updFname
 		mnfst.Contents = append(mnfst.Contents, tMap)
 
 		// TODO: maybe update the meta data of the file just uploaded to Spaces with

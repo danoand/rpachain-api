@@ -22,8 +22,19 @@ import (
 
 var err error
 var hndlr handlers.HandlerEnv
+var workerOverride bool // command line argurment indicating this instance is a worker instance
 
 func main() {
+
+	// Starting this instance as a worker instanc (from the command line)
+	if len(os.Args) > 1 {
+		// we have passed arguments... check them out
+		if os.Args[1] == "worker" {
+			// starting this as a worker instance
+			log.Printf("INFO: %v - starting this instance as a worker web service", utils.FileLine())
+			workerOverride = true
+		}
+	}
 
 	// Construct the MongoDB connection string
 	connStr := fmt.Sprintf(config.Cfg.MGDBURLString, config.Cfg.MGDBPassword)
@@ -45,6 +56,11 @@ func main() {
 		log.Fatalf("FATAL: %v - fatal error pinging the MongoDB database. See: %v", utils.FileLine(), err)
 	}
 	tmpcancel()
+
+	// If starting as a worker instance, override read environment variables
+	if workerOverride {
+		config.Cfg.WrkIsWorkerInstance = true
+	}
 
 	// Configure handler object
 	hndlr.TimeLocationCT, err = time.LoadLocation(config.Consts["timezone"])

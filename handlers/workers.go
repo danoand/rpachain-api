@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"archive/zip"
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -64,7 +65,7 @@ func (hlr *HandlerEnv) TestFunktion(ctx context.Context, args ...interface{}) er
 	return nil
 }
 
-// ZipRequest creates and stores a tar ball of a request's hashed files
+// ZipRequest creates and stores a zip ball of a request's hashed files
 func (hlr *HandlerEnv) ZipRequest(ctx context.Context, args ...interface{}) error {
 	var (
 		err   error
@@ -161,16 +162,115 @@ func (hlr *HandlerEnv) ZipRequest(ctx context.Context, args ...interface{}) erro
 	// Declare an io.Pipe that will transfer data from an io.Writer to an io.Reader ("piping" it)
 	pr, pw := io.Pipe()
 
-	// Define a tar writer
+	// Define a zip writer
 	zpw := zip.NewWriter(pw)
 
-	// Iterate through the spaces files and send them through the tar "writer"
+	// Iterate through the spaces files and send them through the zip "writer"
 	go func() {
-		// Close the pipe and tar writers at the end of the goroutine
+		// Close the pipe and zip writers at the end of the goroutine
 		defer pw.Close()
 		defer zpw.Close()
 
+		// *********************************
+		// * Process the request's hash data
+		// Zip a "hash" json file -> containing the manifest hash value
+		tMap := make(map[string]string)
+		tMap["hash_manifest"] = req.ManifestHash
+		tMap["network"] = req.ChainNetwork
+		tMap["hash_transaction"] = req.TransactionHash
+		tMap["timestamp"] = req.TimeStamp
+
+		_, bMap, err := utils.ToJSON(tMap)
+		if err != nil {
+			// error transforming a go map to json bytes
+			log.Printf("WRKR: %v - ERROR - %v - error transforming a go map to json bytes. See: %v\n",
+				jid,
+				utils.FileLine(),
+				err)
+
+			goErr = fmt.Errorf("error transforming a go map to json bytes: %v", err)
+		}
+
+		// Create a reader to read the json bytes
+		brdr := bytes.NewReader(bMap)
+
+		// Write the hash json to a file for zipping
+		fzip, err := zpw.Create("_hash.json")
+		if err != nil {
+			// error creating a zip file to contain hash data
+			log.Printf("WRKR: %v - ERROR - %v - error creating a zip file to contain hash data: %v. See: %v\n",
+				jid,
+				utils.FileLine(),
+				"_hash.json",
+				err)
+
+			goErr = fmt.Errorf("error creating a zip file to contain hash data: %v - %v", "_hash.json", err)
+		}
+
+		// Write the hash json to the zip file
+		_, err = io.Copy(fzip, brdr)
+		if err != nil {
+			// error occurred zipping a file
+			log.Printf("WRKR: %v - ERROR - %v - error occurred zipping a file: %v read from the remote bucket. See: %v\n",
+				jid,
+				utils.FileLine(),
+				"_hash.json",
+				err)
+
+			goErr = fmt.Errorf("error occurred zipping a file: %v from the remote bucket: %v", "_hash.json", err)
+		}
+
+		// *************************************
+		// * Process the request's manifest data
+		_, bMap, err = utils.ToJSON(req.Manifest)
+		if err != nil {
+			// error transforming a go object to json bytes
+			log.Printf("WRKR: %v - ERROR - %v - error transforming a go object to json bytes. See: %v\n",
+				jid,
+				utils.FileLine(),
+				err)
+
+			goErr = fmt.Errorf("error transforming a go object to json bytes: %v", err)
+		}
+
+		// Create a reader to read the json bytes
+		brdr = bytes.NewReader(bMap)
+
+		// Write the hash json to a file for zipping
+		fzip, err = zpw.Create("_manifest.json")
+		if err != nil {
+			// error creating a zip file to contain the request's manifest data
+			log.Printf("WRKR: %v - ERROR - %v - error creating a zip file to contain the request's manifest data: %v. See: %v\n",
+				jid,
+				utils.FileLine(),
+				"_manifest.json",
+				err)
+
+			goErr = fmt.Errorf("error creating a zip file to contain the request's manifest data: %v - %v", "_hash.json", err)
+		}
+
+		// Write the hash json to the zip file
+		_, err = io.Copy(fzip, brdr)
+		if err != nil {
+			// error occurred zipping a file
+			log.Printf("WRKR: %v - ERROR - %v - error occurred zipping a file: %v read from the remote bucket. See: %v\n",
+				jid,
+				utils.FileLine(),
+				"_manifest.json",
+				err)
+
+			goErr = fmt.Errorf("error occurred zipping a file: %v from the remote bucket: %v", "_hash.json", err)
+		}
+
+		// *************************************
+		// * Process the request's hashed files
+		// Iterate through the files created during this hash request
 		for _, fname := range fnames {
+			// Did an error occur zipping the the hash or manifest data?
+			if goErr != nil {
+				// error occurred - skip zipping request files
+				break
+			}
 
 			// Generate the new filename for zipping purposes
 			//    delete the leading "<document_id>_" prefix
@@ -253,21 +353,21 @@ func (hlr *HandlerEnv) ZipRequest(ctx context.Context, args ...interface{}) erro
 			err)
 	}
 
-	// Was there an error during the tar'ing process that was not picked up?
+	// Was there an error during the zipping process that was not picked up?
 	if goErr != nil {
-		// error occurred during the tar'ing process
-		log.Printf("WRKR: %v - ERROR - %v - error occurred during the tar'ing process. See: %v\n",
+		// error occurred during the zipping process
+		log.Printf("WRKR: %v - ERROR - %v - error occurred during the zipping process. See: %v\n",
 			jid,
 			utils.FileLine(),
 			goErr)
 
-		return fmt.Errorf("error occurred during the tar'ing process: %v", goErr)
+		return fmt.Errorf("error occurred during the zipping process: %v", goErr)
 	}
 
-	log.Printf("WRKR: %v - INFO - %v bytes of tar file %v written to the remote bucket\n",
+	log.Printf("WRKR: %v - INFO - %v bytes of zip file %v written to the remote bucket\n",
 		utils.FileLine(),
 		n,
-		fmt.Sprintf("%v.tar", docid))
+		fmt.Sprintf("%v.zip", docid))
 
 	return nil
 }
