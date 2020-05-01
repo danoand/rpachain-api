@@ -10,8 +10,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/danoand/rpachain-api/config"
 	"github.com/danoand/rpachain-api/models"
 	"github.com/globalsign/mgo/bson"
@@ -283,7 +281,6 @@ func fmtTxn(txn *web3.Transaction) map[string]string {
 	var retMap = make(map[string]string)
 
 	log.Printf("DEBUG: %v - dump out the web3 transaction\n", utils.FileLine())
-	spew.Dump(txn)
 
 	retMap["nonce"] = fmt.Sprintf("%d", txn.Nonce)
 	retMap["gasprice"] = fmt.Sprintf("%d", txn.GasPrice)
