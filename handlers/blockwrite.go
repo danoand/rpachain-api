@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/danoand/rpachain-api/config"
@@ -30,6 +31,7 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		reqBytes []byte
 		errMap   = make(map[string]string)
 		rspMap   = make(map[string]interface{})
+		bwMtx    sync.Mutex
 	)
 
 	// Get the customer document id from the gin context
@@ -214,7 +216,14 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		fmt.Sprintf("0x%x", mnsum[:32]),
 		fmt.Sprintf("0x%x", txnSC.Hash),
 		fmtTxn(txnSC),
-		utils.FileName())
+		utils.FileName(),
+		&bwMtx)
+
+	// Fetch transaction receipt data and update the blockwrite data referred to above
+	go hlr.saveTxnReceipt(
+		txnSC,
+		mnfst.RequestID,
+		&bwMtx)
 
 	rspMap["msg"] = "hash written to the blockchain"
 	rspMap["txnid"] = fmt.Sprintf("0x%x", txnSC.Hash)

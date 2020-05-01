@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
@@ -33,6 +34,7 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 		// reqBytes []byte
 		errMap = make(map[string]string)
 		rspMap = make(map[string]interface{})
+		bwMtx  sync.Mutex
 	)
 
 	mnfst.MetaData = make(map[string]interface{})
@@ -257,7 +259,14 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 		fmt.Sprintf("0x%x", mnsum[:32]),
 		fmt.Sprintf("0x%x", txnSC.Hash),
 		fmtTxn(txnSC),
-		utils.FileName())
+		utils.FileName(),
+		&bwMtx)
+
+	// Fetch transaction receipt data and update the blockwrite data referred to above
+	go hlr.saveTxnReceipt(
+		txnSC,
+		mnfst.RequestID,
+		&bwMtx)
 
 	rspMap["msg"] = "hash written to the blockchain"
 	rspMap["txnid"] = fmt.Sprintf("0x%x", txnSC.Hash)
