@@ -2,13 +2,13 @@
 </div>
 <div id="logo" class="light-version">
         <span>
-            Homer Angular App
+            RPAChain
         </span>
 </div>
-<nav role="navigation">
-        <minimaliza-menu></minimaliza-menu>
+<nav role="navigation" ng-controller="navCtrl">
+    <minimaliza-menu></minimaliza-menu>
     <div class="small-logo">
-        <span class="text-primary">HOMER APP</span>
+        <span class="text-primary">RPAChain</span>
     </div>
     <div class="mobile-menu">
         <button type="button" class="navbar-toggle mobile-menu-toggle" data-toggle="collapse" data-target="#mobile-collapse">
@@ -17,7 +17,7 @@
         <div class="collapse mobile-navbar" id="mobile-collapse">
             <ul class="nav navbar-nav">
                 <li>
-                    <a href="#">Login</a>
+                    <a ng-click="logOff()">Logoff</a>
                 </li>
             </ul>
         </div>
@@ -25,7 +25,7 @@
     <div class="navbar-right">
         <ul class="nav navbar-nav no-borders">
             <li>
-                <a>
+                <a ng-click="logOff()">
                     <i class="pe-7s-upload pe-rotate-90"></i>
                 </a>
             </li>

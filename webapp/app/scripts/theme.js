@@ -1,9 +1,3 @@
-/**
- * HOMER - Responsive Admin Theme
- * version 2.0
- *
- */
-
 $(document).ready(function () {
 
     // Set minimal height of #wrapper to fit the window

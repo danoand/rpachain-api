@@ -1,10 +1,11 @@
 <div class="color-line"></div>
 
-<div class="back-link">
-    <a ui-sref="dashboard" class="btn btn-primary">Back to Dashboard</a>
-</div>
-
 <div class="login-container" ng-controller="loginCtrl">
+    <div class="row">
+        <div class="col-md-12">
+            <div growl></div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-12">
             <div class="text-center m-b-md">
@@ -13,7 +14,7 @@
             </div>
             <div class="hpanel">
                 <div class="panel-body">
-                        <form action="#" id="loginForm">
+                        <form>
                             <div class="form-group">
                                 <label class="control-label" for="username">Username</label>
                                 <input type="text" placeholder="example@gmail.com" title="Please enter you username" 
@@ -25,11 +26,6 @@
                                 <input type="password" title="Please enter your password" placeholder="******" 
                                 required="" value="" name="password" id="password" class="form-control"
                                 ng-model="password">
-                            </div>
-                            <div class="checkbox">
-                                    <input icheck type="checkbox" ng-model="remember" ng-init="remember = true">
-                                     Remember login
-                                <p class="help-block small">(if this is a private computer)</p>
                             </div>
                             <button class="btn btn-success btn-block" ng-click="submit()">Login</button>
                         </form>

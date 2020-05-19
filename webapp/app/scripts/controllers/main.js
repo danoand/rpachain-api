@@ -5,13 +5,14 @@
  */
 
 angular
-    .module('homer')
+    .module('rpachain')
     .controller('appCtrl', appCtrl)
-    .controller('loginCtrl', loginCtrl);
+    .controller('loginCtrl', loginCtrl)
+    .controller('navCtrl', navCtrl);
 
 function appCtrl($http, $scope) {};
 
-function loginCtrl($http, $scope) {
+function loginCtrl($http, $scope, $state, growl) {
     console.log('DEBUG: just inside loginCtrl');
 
     // Set initial values
@@ -20,6 +21,8 @@ function loginCtrl($http, $scope) {
     
     // Submit the login form
     $scope.submit = function () {
+        console.log('DEBUG: just inside the submit button');
+
         // Call backend to validate username and password
         $http({
             method: 'POST',
@@ -29,12 +32,40 @@ function loginCtrl($http, $scope) {
                 password: $scope.password
             }
         }).then(function successCallback(response) {
-            console.log(JSON.stringify(response.data.msg));
+            console.log(JSON.stringify(response));
+
+            growl.success(response.data.msg, {ttl: 1000});
+
+            $state.go('dashboard');
             
         }, function errorCallback(response) {
             // Authentication was failed
             console.log('ERROR: Error callback for /login with response: ' + JSON.stringify(response));
 
+            growl.warning(response.data.msg, {ttl: 2500});
+        });
+    };
+};
+
+function navCtrl($http, $scope, $state, growl) {
+    
+    // Logoff of the web application
+    $scope.logOff = function () {
+
+        // Call backend to validate username and password
+        $http({
+            method: 'POST',
+            url: '/webapp/logoff'
+        }).then(function successCallback(response) {
+            console.log(JSON.stringify(response));
+
+            growl.success(response.data.msg, {ttl: 1000});
+            $state.go('login');
+            
+        }, function errorCallback(response) {
+            // Authentication was failed
+            console.log('ERROR: Error callback for /login with response: ' + JSON.stringify(response));
+            growl.warning(response.data.msg, {ttl: 2500});
         });
     };
 };

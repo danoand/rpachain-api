@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	ginsession "github.com/go-session/gin-session"
 
 	"github.com/danoand/rpachain-api/config"
 	"github.com/danoand/rpachain-api/handlers"
@@ -18,15 +19,18 @@ var router *gin.Engine
 func initStandardRoutes(hndlr *hdl.HandlerEnv) {
 
 	web := router.Group("/webapp")
+	web.Use(ginsession.New())
 	{
 		web.Static("/fonts", "webapp/app/fonts")
 		web.Static("/styles", "webapp/app/styles")
 		web.Static("/scripts", "webapp/app/scripts")
 		web.Static("/app_components", "webapp/app_components")
 		web.Static("/views", "webapp/app/views")
+		web.Static("/images", "webapp/app/images")
 		web.StaticFile("/", "webapp/app/index.html")
 
 		web.POST("/login", hndlr.Login)
+		web.POST("logoff", hndlr.Logoff)
 	}
 
 	apiv1 := router.Group("/api/v1")
@@ -48,6 +52,7 @@ func initWorkerRoutes(hndlr *handlers.HandlerEnv) {
 
 // SetupRouter creates a router for use downstream
 func SetupRouter(hndlr *handlers.HandlerEnv) *gin.Engine {
+
 	router = gin.Default()
 
 	// Standard app instance? (ie. not a Faktory instance)

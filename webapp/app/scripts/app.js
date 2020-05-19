@@ -1,12 +1,8 @@
-/**
- * HOMER - Responsive Admin Theme
- * version 2.0
- *
- */
 (function () {
-    angular.module('homer', [
+    angular.module('rpachain', [
         'ui.router',                // Angular flexible routing
-        'ui.bootstrap'             // AngularJS native directives for Bootstrap
+        'ui.bootstrap',             // AngularJS native directives for Bootstrap
+        'angular-growl'             // Angular Growl (notifications)
     ])
 })();
 

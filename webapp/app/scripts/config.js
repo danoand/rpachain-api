@@ -28,7 +28,7 @@ function configState($stateProvider, $urlRouterProvider, $compileProvider) {
 }
 
 angular
-    .module('homer')
+    .module('rpachain')
     .config(configState)
     .run(function($rootScope, $state) {
         $rootScope.$state = $state;

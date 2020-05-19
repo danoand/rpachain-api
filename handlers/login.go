@@ -8,6 +8,8 @@ import (
 
 	mdl "github.com/danoand/rpachain-api/models"
 
+	"github.com/go-session/gin-session"
+
 	"github.com/danoand/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/globalsign/mgo/bson"
@@ -16,10 +18,9 @@ import (
 // Login validates a login session
 func (hlr *HandlerEnv) Login(c *gin.Context) {
 	var err error
+	var pAcct mdl.Account
 	var acct mdl.Account
-	var eResp = make(map[string]interface{})
-
-	log.Printf("DEBUG: %v - in Login handler\n", utils.FileLine())
+	var rsp = make(map[string]interface{})
 
 	// Get parameters
 	bbytes, err := c.GetRawData()
@@ -29,33 +30,32 @@ func (hlr *HandlerEnv) Login(c *gin.Context) {
 			utils.FileLine(),
 			err)
 
-		eResp["msg"] = "error grabbing request data"
-		c.JSON(http.StatusBadRequest, eResp)
+		rsp["msg"] = "error grabbing request data"
+		c.JSON(http.StatusBadRequest, rsp)
 		return
 	}
 
 	// Parse the request body
-	err = utils.FromJSONBytes(bbytes, &acct)
+	err = utils.FromJSONBytes(bbytes, &pAcct)
 	if err != nil {
 		// error parsing the request body data
 		log.Printf("ERROR: %v - error parsing the request body data. See: %v\n",
 			utils.FileLine(),
 			err)
 
-		eResp["msg"] = "error parsing the request body data"
-		c.JSON(http.StatusInternalServerError, eResp)
+		rsp["msg"] = "error parsing the request body data"
+		c.JSON(http.StatusInternalServerError, rsp)
 		return
 	}
 
 	// Validate the inbound data
-	if len(acct.Username) == 0 || len(acct.Password) == 0 {
+	if len(pAcct.Username) == 0 || len(pAcct.Password) == 0 {
 		// missing username or password
 		log.Printf("ERROR: %v - missing username or password\n",
-			utils.FileLine(),
-			err)
+			utils.FileLine())
 
-		eResp["msg"] = "missing username or password"
-		c.JSON(http.StatusBadRequest, eResp)
+		rsp["msg"] = "missing username or password"
+		c.JSON(http.StatusBadRequest, rsp)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (hlr *HandlerEnv) Login(c *gin.Context) {
 	ctx, cncl := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cncl()
 
-	rslt := hlr.CollAccounts.FindOne(ctx, bson.M{"username": acct.Username})
+	rslt := hlr.CollAccounts.FindOne(ctx, bson.M{"username": pAcct.Username})
 
 	// Decode the fetch into a go object
 	err = rslt.Decode(&acct)
@@ -73,12 +73,27 @@ func (hlr *HandlerEnv) Login(c *gin.Context) {
 			utils.FileLine(),
 			err)
 
-		eResp["msg"] = "error fetching a user account"
-		c.JSON(http.StatusBadRequest, eResp)
+		rsp["msg"] = "error fetching a user account"
+		c.JSON(http.StatusBadRequest, rsp)
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"message": "you are now logged in",
-	})
+	// Does the password parameter match the account password?
+	if pAcct.Password != acct.Password {
+		// incorrect password
+		log.Printf("ERROR - %v - incorrect password\n",
+			utils.FileLine())
+
+		rsp["msg"] = "incorrect password"
+		c.JSON(http.StatusBadRequest, rsp)
+		return
+	}
+
+	// Set session elements
+	store := ginsession.FromContext(c)
+	store.Set("docid", acct.ID)
+	store.Set("username", acct.Username)
+
+	rsp["msg"] = "you are now logged in"
+	c.JSON(http.StatusOK, rsp)
 }

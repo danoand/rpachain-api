@@ -150,7 +150,7 @@ func main() {
 	}
 
 	// Stand up the gin based server
-	gin.SetMode(gin.TestMode)
+	gin.SetMode(gin.DebugMode)
 	router := routes.SetupRouter(&hndlr)
 
 	log.Printf("INFO: %v - start up the web server on: %v\n", utils.FileLine(), port)

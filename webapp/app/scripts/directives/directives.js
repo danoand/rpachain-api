@@ -1,11 +1,5 @@
-/**
- * HOMER - Responsive Admin Theme
- * Copyright 2015 Webapplayers.com
- *
- */
-
 angular
-    .module('homer')
+    .module('rpachain')
     .directive('pageTitle', pageTitle)
     .directive('sideNavigation', sideNavigation)
     .directive('minimalizaMenu', minimalizaMenu)
@@ -25,9 +19,9 @@ function pageTitle($rootScope, $timeout) {
         link: function(scope, element) {
             var listener = function(event, toState, toParams, fromState, fromParams) {
                 // Default title
-                var title = 'HOMER | AngularJS Responsive WebApp';
+                var title = 'RPACHAIN | RPA to the power of Blockchain';
                 // Create your own title pattern
-                if (toState.data && toState.data.pageTitle) title = 'HOMER | ' + toState.data.pageTitle;
+                if (toState.data && toState.data.pageTitle) title = 'RPACHAIN | ' + toState.data.pageTitle;
                 $timeout(function() {
                     element.text(title);
                 });
