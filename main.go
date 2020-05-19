@@ -16,6 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gochain/web3"
 	"github.com/minio/minio-go"
+	che "github.com/patrickmn/go-cache"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -71,6 +72,7 @@ func main() {
 	hndlr.Database = hndlr.Client.Database("rpachain-dev")
 	hndlr.CollStatus = hndlr.Database.Collection("status")
 	hndlr.CollBlockWrites = hndlr.Database.Collection("blockwrites")
+	hndlr.CollAccounts = hndlr.Database.Collection("accounts")
 	// Create an object dialing the GoChain network
 	hndlr.GoChainNetwork, err = web3.Dial(config.Cfg.GoChainURL)
 	if err != nil {
@@ -100,6 +102,8 @@ func main() {
 
 		os.Exit(1)
 	}
+	// Declare a cache
+	hndlr.Cache = che.New(60*time.Minute, 70*time.Minute)
 
 	// Set the localhost port for web api mode
 	port := config.Consts["localport_api"]

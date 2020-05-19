@@ -7,6 +7,7 @@ import (
 
 	"github.com/danoand/rpachain-api/config"
 	"github.com/danoand/rpachain-api/handlers"
+	hdl "github.com/danoand/rpachain-api/handlers"
 	mdw "github.com/danoand/rpachain-api/middleware"
 	"github.com/danoand/utils"
 )
@@ -14,7 +15,19 @@ import (
 var router *gin.Engine
 
 // initStandardRoutes initializes API and related routes enabling the standard web application
-func initStandardRoutes(hndlr *handlers.HandlerEnv) {
+func initStandardRoutes(hndlr *hdl.HandlerEnv) {
+
+	web := router.Group("/webapp")
+	{
+		web.Static("/fonts", "webapp/app/fonts")
+		web.Static("/styles", "webapp/app/styles")
+		web.Static("/scripts", "webapp/app/scripts")
+		web.Static("/app_components", "webapp/app_components")
+		web.Static("/views", "webapp/app/views")
+		web.StaticFile("/", "webapp/app/index.html")
+
+		web.POST("/login", hndlr.Login)
+	}
 
 	apiv1 := router.Group("/api/v1")
 	{

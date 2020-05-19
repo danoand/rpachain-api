@@ -5,6 +5,7 @@ import (
 
 	"github.com/gochain/web3"
 	"github.com/minio/minio-go"
+	che "github.com/patrickmn/go-cache"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/gridfs"
 
@@ -20,6 +21,7 @@ type HandlerEnv struct {
 	GridFS                 *gridfs.Bucket
 	CollStatus             *mongo.Collection
 	CollBlockWrites        *mongo.Collection
+	CollAccounts           *mongo.Collection
 	GoChainNetwork         web3.Client
 	GoChainNetworkString   string
 	GoChainCntrAddrLogHash string        // address of contract
@@ -27,4 +29,5 @@ type HandlerEnv struct {
 	SpacesClient           *minio.Client //
 	FaktoryManager         *wrk.Manager  // Faktory worker queue manager (work queued jobs)
 	FaktoryClient          *fak.Client   // Faktory worker client (queue jobs)
+	Cache                  *che.Cache
 }
