@@ -9,7 +9,6 @@ import (
 	"github.com/danoand/rpachain-api/config"
 	"github.com/danoand/rpachain-api/handlers"
 	hdl "github.com/danoand/rpachain-api/handlers"
-	mdw "github.com/danoand/rpachain-api/middleware"
 	"github.com/danoand/utils"
 )
 
@@ -30,14 +29,14 @@ func initStandardRoutes(hndlr *hdl.HandlerEnv) {
 		web.StaticFile("/", "webapp/app/index.html")
 
 		web.POST("/login", hndlr.Login)
-		web.POST("logoff", hndlr.Logoff)
+		web.POST("/logoff", hndlr.Logoff)
 	}
 
 	apiv1 := router.Group("/api/v1")
 	{
 		apiv1.GET("/status", hndlr.Status)
-		apiv1.POST("/blockwrite", mdw.APIAuth(), hndlr.BlockWrite)
-		apiv1.POST("/blockwritefiles", mdw.APIAuth(), hndlr.BlockWriteFiles)
+		apiv1.POST("/blockwrite", hndlr.APIAuth(), hndlr.BlockWrite)
+		apiv1.POST("/blockwritefiles", hndlr.APIAuth(), hndlr.BlockWriteFiles)
 	}
 }
 

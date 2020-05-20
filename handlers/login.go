@@ -7,12 +7,12 @@ import (
 	"time"
 
 	mdl "github.com/danoand/rpachain-api/models"
+	"github.com/globalsign/mgo/bson"
 
-	"github.com/go-session/gin-session"
+	ginsession "github.com/go-session/gin-session"
 
 	"github.com/danoand/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/globalsign/mgo/bson"
 )
 
 // Login validates a login session
@@ -91,9 +91,10 @@ func (hlr *HandlerEnv) Login(c *gin.Context) {
 
 	// Set session elements
 	store := ginsession.FromContext(c)
-	store.Set("docid", acct.ID)
+	store.Set("docid", acct.ID.Hex())
 	store.Set("username", acct.Username)
 
 	rsp["msg"] = "you are now logged in"
+	rsp["content"] = map[string]string{"docid": acct.ID.Hex(), "username": acct.Username}
 	c.JSON(http.StatusOK, rsp)
 }

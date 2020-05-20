@@ -8,12 +8,13 @@ angular
     .module('rpachain')
     .controller('appCtrl', appCtrl)
     .controller('loginCtrl', loginCtrl)
-    .controller('navCtrl', navCtrl);
+    .controller('navCtrl', navCtrl)
+    .factory('sessSvc', sessSvc);
 
 function appCtrl($http, $scope) {};
 
-function loginCtrl($http, $scope, $state, growl, $cookies) {
-    console.log('DEBUG: just inside loginCtrl');
+// loginCtrl controls the Login view
+function loginCtrl($http, $scope, $state, $cookies, growl, sessSvc) {
     $cookies.remove('go_session_id');
 
     // Set initial values
@@ -22,7 +23,6 @@ function loginCtrl($http, $scope, $state, growl, $cookies) {
     
     // Submit the login form
     $scope.submit = function () {
-        console.log('DEBUG: just inside the submit button');
 
         // Call backend to validate username and password
         $http({
@@ -34,8 +34,9 @@ function loginCtrl($http, $scope, $state, growl, $cookies) {
             }
         }).then(function successCallback(response) {
             console.log(JSON.stringify(response));
-
+            sessSvc.setUserData(response.data.content);
             growl.success(response.data.msg, {ttl: 1000});
+            sessSvc.dumpUserData();
 
             $state.go('dashboard');
             
@@ -48,6 +49,7 @@ function loginCtrl($http, $scope, $state, growl, $cookies) {
     };
 };
 
+// navCtrl controls the common > navigation view
 function navCtrl($http, $scope, $state, growl, $cookies) {
     
     // Logoff of the web application
@@ -69,6 +71,29 @@ function navCtrl($http, $scope, $state, growl, $cookies) {
             console.log('ERROR: Error callback for /login with response: ' + JSON.stringify(response));
             growl.warning(response.data.msg, {ttl: 2500});
         });
+    };
+};
+
+// sessSvc provides user session type services
+function sessSvc() {
+    // Define variables that house data for this service
+    var sess_user = {};
+    sess_user.docid     = "";
+    sess_user.username  = "";
+
+    // Define methods associated with this service
+    return {
+        // Set user session data
+        setUserData: function(inval) {
+            sess_user.docid     = inval["docid"];
+            sess_user.username  = inval["username"];
+        },
+        getUserData: function() {
+            return sess_user;
+        },
+        dumpUserData: function() {
+            console.log('DEBUG: user session data is: ' + JSON.stringify(sess_user));
+        }
     };
 };
 
