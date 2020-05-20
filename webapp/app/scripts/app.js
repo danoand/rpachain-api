@@ -3,7 +3,8 @@
         'ui.router',                // Angular flexible routing
         'ui.bootstrap',             // AngularJS native directives for Bootstrap
         'angular-growl',            // Angular Growl (notifications)
-        'ngCookies'                 // Angular cookies
+        'ngCookies',                // Angular cookies
+        'chart.js'                  // Chart.js (charting/graphs)
     ])
 })();
 

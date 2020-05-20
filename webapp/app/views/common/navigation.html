@@ -1,15 +1,12 @@
-<div id="navigation">
+<div id="navigation" ng-controller="navCtrl">
     <div class="profile-picture">
         <div class="stats-label text-color">
-            <span class="font-extra-bold font-uppercase">Username</span>
+            <span class="font-extra-bold font-uppercase">{{ username }}</span>
 
             <div class="dropdown" uib-dropdown >
                 <a uib-dropdown-toggle href="#">
-                    <small class="text-muted">Founder of App <b class="caret"></b></small>
+                    <small class="text-muted">Admin</small>
                 </a>
-                <ul uib-dropdown-menu class="animated flipInX m-t-xs">
-                    <li><a>Item</a></li>
-                </ul>
             </div>
         </div>
     </div>

@@ -95,6 +95,9 @@ func (hlr *HandlerEnv) Login(c *gin.Context) {
 	store.Set("username", acct.Username)
 
 	rsp["msg"] = "you are now logged in"
-	rsp["content"] = map[string]string{"docid": acct.ID.Hex(), "username": acct.Username}
+	rsp["content"] = map[string]string{
+		"docid":       acct.ID.Hex(),
+		"username":    acct.Username,
+		"accountname": acct.AccountName}
 	c.JSON(http.StatusOK, rsp)
 }
