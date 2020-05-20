@@ -12,8 +12,9 @@ angular
 
 function appCtrl($http, $scope) {};
 
-function loginCtrl($http, $scope, $state, growl) {
+function loginCtrl($http, $scope, $state, growl, $cookies) {
     console.log('DEBUG: just inside loginCtrl');
+    $cookies.remove('go_session_id');
 
     // Set initial values
     $scope.username = "";
@@ -47,10 +48,11 @@ function loginCtrl($http, $scope, $state, growl) {
     };
 };
 
-function navCtrl($http, $scope, $state, growl) {
+function navCtrl($http, $scope, $state, growl, $cookies) {
     
     // Logoff of the web application
     $scope.logOff = function () {
+        $cookies.remove('go_session_id');
 
         // Call backend to validate username and password
         $http({
