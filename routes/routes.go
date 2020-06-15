@@ -28,6 +28,8 @@ func initStandardRoutes(hndlr *hdl.HandlerEnv) {
 		web.Static("/images", "webapp/app/images")
 		web.StaticFile("/", "webapp/app/index.html")
 
+		web.GET("/getblockwrites", hndlr.WebAuth(), hndlr.GetBlockWrites)
+
 		web.POST("/login", hndlr.Login)
 		web.POST("/logoff", hndlr.Logoff)
 	}

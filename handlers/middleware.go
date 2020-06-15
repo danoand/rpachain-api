@@ -12,7 +12,6 @@ import (
 	"github.com/danoand/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/globalsign/mgo/bson"
-	ginsession "github.com/go-session/gin-session"
 )
 
 // APIAuth is middleware that authorizes a client API call and associates
@@ -35,47 +34,15 @@ func (hlr *HandlerEnv) APIAuth() gin.HandlerFunc {
 // WebAuth is middleware that authorizes a web request
 func (hlr *HandlerEnv) WebAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var val interface{}
-		var ok bool
 		var docid, username string
 		var result bson.M
 
-		// Grab the user's account document id and username from the session (if present)
-		// Get session elements
-		store := ginsession.FromContext(c)
-		val, ok = store.Get("docid")
-		if !ok {
-			// document id missing from the context
-			c.AbortWithStatusJSON(
-				http.StatusUnauthorized,
-				gin.H{"msg": "not authorized; please log in"})
-			return
-		}
-		docid, ok = val.(string)
-		if !ok {
-			// invalid type for document id value
-			c.AbortWithStatusJSON(
-				http.StatusInternalServerError,
-				gin.H{"msg": "an error occurred; please log in again"})
-			return
-		}
+		// Make a copy of the gin context
+		cpy := c.Copy()
 
-		val, ok = store.Get("username")
-		if !ok {
-			// username missing from the context
-			c.AbortWithStatusJSON(
-				http.StatusUnauthorized,
-				gin.H{"msg": "not authorized; please log in"})
-			return
-		}
-		username, ok = val.(string)
-		if !ok {
-			// invalid type for document id value
-			c.AbortWithStatusJSON(
-				http.StatusInternalServerError,
-				gin.H{"msg": "an error occurred; please log in again"})
-			return
-		}
+		// Get the request headers
+		docid = cpy.GetHeader("X-docid")
+		username = cpy.GetHeader("X-username")
 
 		// Grab the account from the database
 		docID, err := primitive.ObjectIDFromHex(docid)

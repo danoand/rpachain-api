@@ -6,12 +6,13 @@
 
 angular
     .module('rpachain')
-    .controller('appCtrl',      appCtrl)
-    .controller('loginCtrl',    loginCtrl)
-    .controller('hdrCtrl',      hdrCtrl)
-    .controller('navCtrl',      navCtrl)
-    .controller('dashCtrl',     dashCtrl)
-    .factory('sessSvc',         sessSvc);
+    .controller('appCtrl',                  appCtrl)
+    .controller('loginCtrl',                loginCtrl)
+    .controller('hdrCtrl',                  hdrCtrl)
+    .controller('navCtrl',                  navCtrl)
+    .controller('dashCtrl',                 dashCtrl)
+    .controller('dashBlockWritesTableCtrl', dashBlockWritesTableCtrl)
+    .factory('sessSvc',                     sessSvc);
 
 function appCtrl($http, $scope) {};
 
@@ -150,6 +151,43 @@ function dashCtrl($scope, sessSvc) {
     };
     
 };
+
+// dashBlockWritesTableCtrl controls the the block write table on the dashboard view
+function dashBlockWritesTableCtrl($http, $scope, sessSvc) {
+    // $scope.myData = [{"name": "Tom"}, {"name": "Harry"}];
+    prms = sessSvc.getUserData()
+    hdrs = {};
+    hdrs["X-username"] = prms.username;
+    hdrs["X-docid"] = prms.docid;
+
+    $scope.gridOptions = {
+        columnDefs: [
+          { name: 'network', enableSorting: true },
+          { name: 'timestamp', enableSorting: true },
+          { name: 'block', enableSorting: true },
+          { name: 'action', enableSorting: false },
+          { name: 'explorer_link', enableSorting: false }
+        ],
+        onRegisterApi: function(gridApi) {
+          $scope.gridApi = gridApi;
+        }
+      };
+
+    // Call backend to validate username and password
+    $http({
+        method: 'GET',
+        url: '/webapp/getblockwrites',
+        headers: hdrs
+    }).then(function successCallback(response) {
+        console.log(JSON.stringify(response.data.content));
+        $scope.gridOptions.data = response.data.content; 
+    }, function errorCallback(response) {
+        // Authentication was failed
+        console.log('ERROR: Error callback for /webapp/getblockwrites with response: ' + JSON.stringify(response));
+
+        growl.warning(response.data.msg, {ttl: 2500});
+    });
+}
 
 // sessSvc provides user session type services
 function sessSvc() {

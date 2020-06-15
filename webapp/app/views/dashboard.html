@@ -18,6 +18,7 @@
     <div class="col-lg-12">
         <div class="hpanel">
             <div class="panel-heading">
+            <div panel-tools></div>
                 Blockchain Activity (GoChain Mainnet)
             </div>
             <div class="panel-body">
@@ -26,6 +27,21 @@
                     chart-labels="labels" chart-series="series" chart-options="options"
                     chart-dataset-override="datasetOverride" chart-click="onClick">
                     </canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 ">
+        <div class="hpanel" ng-controller="dashBlockWritesTableCtrl as dashTable">
+            <div class="panel-heading">
+                <div panel-tools></div>
+                Dashboard information and statistics
+            </div>
+            <div class="panel-body">
+                <div>
+                    <div ng-controller="dashBlockWritesTableCtrl">
+                        <div id="grid1" ui-grid="gridOptions" class="grid"></div>
+                    </div>
                 </div>
             </div>
         </div>
