@@ -5,7 +5,8 @@
         'angular-growl',            // Angular Growl (notifications)
         'ngCookies',                // Angular cookies
         'chart.js',                 // Chart.js (charting/graphs)
-        'ui.grid'                   // ui-grid (tables)
+        'ui.grid',                  // ui-grid (tables)
+        'ui.grid.selection'
     ])
 })();
 

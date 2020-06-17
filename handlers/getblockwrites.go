@@ -11,6 +11,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"github.com/danoand/rpachain-api/config"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,7 +24,7 @@ func (hlr *HandlerEnv) GetBlockWrites(c *gin.Context) {
 
 	// Fetch the block writes from the database
 	opts := options.Find().SetSort(bson.D{{"manifest.timestamp", -1}})
-	csr, err := hlr.CollBlockWrites.Find(context.TODO(), bson.D{}, opts)
+	csr, err := hlr.CollBlockWrites.Find(context.TODO(), bson.M{"deleted": bson.M{"$ne": true}}, opts)
 	if err != nil {
 		// error fetching blockwrites from the database
 		log.Printf("ERROR: %v - error fetching blockwrites from the database. See: %v\n",
@@ -56,7 +58,7 @@ func (hlr *HandlerEnv) GetBlockWrites(c *gin.Context) {
 		tmpCnt["block"] = elm.BlockNumber
 		tmpCnt["action"] = "Notarize content to the blockchain"
 		tmpCnt["explorer_link"] = fmt.Sprintf("%vblock/%v",
-			elm.ChainNetwork,
+			config.Consts["gochain_testnet_explorer"],
 			elm.BlockNumber)
 
 		// Add element to the response

@@ -153,14 +153,21 @@ function dashCtrl($scope, sessSvc) {
 };
 
 // dashBlockWritesTableCtrl controls the the block write table on the dashboard view
-function dashBlockWritesTableCtrl($http, $scope, sessSvc) {
+function dashBlockWritesTableCtrl($http, $scope, $window, sessSvc) {
     // $scope.myData = [{"name": "Tom"}, {"name": "Harry"}];
-    prms = sessSvc.getUserData()
-    hdrs = {};
+    var prms = sessSvc.getUserData()
+    var hdrs = {};
     hdrs["X-username"] = prms.username;
     hdrs["X-docid"] = prms.docid;
+    var selected_rows = [];
+
+    $scope.blockURL = '';
 
     $scope.gridOptions = {
+        showGridFooter: true,
+        enableRowSelection: true,
+        multiSelect: false,
+        enableRowHeaderSelection: false,
         columnDefs: [
           { name: 'network', enableSorting: true },
           { name: 'timestamp', enableSorting: true },
@@ -170,6 +177,17 @@ function dashBlockWritesTableCtrl($http, $scope, sessSvc) {
         ],
         onRegisterApi: function(gridApi) {
           $scope.gridApi = gridApi;
+
+          gridApi.selection.on.rowSelectionChanged($scope,function(row){
+            $scope.blockURL = '';
+            selected_rows   = [];
+
+            var tmp_count = gridApi.selection.getSelectedCount();
+            if (tmp_count == 1) {
+                selected_rows   = gridApi.selection.getSelectedRows();
+                $scope.blockURL = selected_rows[0]["explorer_link"];
+            }
+          });
         }
       };
 
@@ -179,7 +197,7 @@ function dashBlockWritesTableCtrl($http, $scope, sessSvc) {
         url: '/webapp/getblockwrites',
         headers: hdrs
     }).then(function successCallback(response) {
-        console.log(JSON.stringify(response.data.content));
+        console.log('DEBUG: ' + JSON.stringify(response.data.content));
         $scope.gridOptions.data = response.data.content; 
     }, function errorCallback(response) {
         // Authentication was failed
@@ -187,6 +205,14 @@ function dashBlockWritesTableCtrl($http, $scope, sessSvc) {
 
         growl.warning(response.data.msg, {ttl: 2500});
     });
+
+    // View block explorer block
+    $scope.displayBlockExploreBlock = function (to_url) {
+        if ($scope.blockURL.length == 0) {
+            return
+        }
+        $window.open($scope.blockURL, '_blank');
+    };
 }
 
 // sessSvc provides user session type services
