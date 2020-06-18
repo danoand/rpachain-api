@@ -153,7 +153,7 @@ function dashCtrl($scope, sessSvc) {
 };
 
 // dashBlockWritesTableCtrl controls the the block write table on the dashboard view
-function dashBlockWritesTableCtrl($http, $scope, $window, sessSvc) {
+function dashBlockWritesTableCtrl($http, $scope, $state, $window, sessSvc) {
     // $scope.myData = [{"name": "Tom"}, {"name": "Harry"}];
     var prms = sessSvc.getUserData()
     var hdrs = {};
@@ -212,6 +212,11 @@ function dashBlockWritesTableCtrl($http, $scope, $window, sessSvc) {
             return
         }
         $window.open($scope.blockURL, '_blank');
+    };
+
+    // Display the 'Add to Chain' Form
+    $scope.gotoAddBlockWrite = function() {
+        $state.go('app_views.blockwrite_add');
     };
 }
 

@@ -25,6 +25,25 @@ function configState($stateProvider, $urlRouterProvider, $compileProvider) {
                 pageTitle: 'Login',
             }
         })
+
+        // App views
+        .state('app_views', {
+            abstract: true,
+            url: "/app_views",
+            templateUrl: "views/common/content.html",
+            data: {
+                pageTitle: 'App Views'
+            }
+        })
+        // (Manually) Add to the Blockchain
+        .state('app_views.blockwrite_add', {
+            url: "/blockwrite_addd",
+            templateUrl: "views/app_views/blockwrite_manual_add.html",
+            data: {
+              pageTitle: 'Add to Chain',
+              pageDesc: 'Notarize content and files to the Chain.'
+            }
+          })
 }
 
 angular

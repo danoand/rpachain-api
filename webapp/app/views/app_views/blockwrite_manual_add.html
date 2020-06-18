@@ -1,0 +1,225 @@
+<!-- <div ng-controller="promotionGeneralAddCtrl"> -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="hpanel hblue">
+                <div class="panel-heading hbuilt" data-context="blockwrite_manual_add.html">
+                    Add a General Promotion
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group" ng-if="config.genericpromosenabled">
+                            <label class="col-sm-2 control-label" for="promo.promogenxpathisgenericpromo">Generic Promotion</label>
+                            <div class="col-sm-10">
+                                <div>
+                                    <label> 
+                                        <input type="checkbox" class="i-checks" ng-model="promo.promogenxpathisgenericpromo" 
+                                        ng-focus="bgCheckGenPrm=true" ng-blur="bgCheckGenPrm=false"
+                                        ng-style="bgCheckGenPrm ? {'background-color': config.highlight} : {}"> 
+                                        Send as a Generic Promotion
+                                    </label>
+                                    <p class="help-block">Send this as a generic promotion.  Generic promotions don't have a salutation, introduction, dates, or redepmtion actions.</p>
+                                </div> 
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Title*</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="promo.promogentitle" required
+                                    ng-focus="bgTitle=true" ng-blur="bgTitle=false"
+                                    ng-style="bgTitle ? {'background-color': config.highlight} : {}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Status*</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-model="promo.status" required ng-focus="bgStatus=true"
+                                    ng-blur="bgStatus=false"
+                                    ng-style="bgStatus ? {'background-color': config.highlight} : {}">
+                                    <option value="None">-- Status --</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                                <span class="help-block m-b-none">Select a generic offer or a specific promotion
+                                    type</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="promo.promogendescription">Description</label>
+                            <div class="col-sm-10">
+                                <textarea rows="6" cols="50" class="form-control input-sm"
+                                    id="promo.promogendescription" ng-model="promo.promogendescription"
+                                    ng-focus="bgDescription=true" ng-blur="bgDescription=false"
+                                    ng-style="bgDescription ? {'background-color': config.highlight} : {}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-hide="promo.promogenxpathisgenericpromo">
+                            <label class="col-sm-2 control-label" for="promo.promogencustomcalltoaction">Call to Action</label>
+                            <div class="col-sm-10">
+                                <div>
+                                    <label> 
+                                        <input type="checkbox" class="i-checks" ng-model="promo.hascustomcalltoaction" ng-click="clickCTA()"
+                                        ng-focus="bgCheckCTA=true" ng-blur="bgCheckCTA=false"
+                                        ng-style="bgCheckCTA ? {'background-color': config.highlight} : {}"> 
+                                        Custom Call to Action
+                                    </label>
+                                </div>
+                                <input type="text" class="form-control" ng-model="promo.promogencustomcalltoaction"
+                                    ng-disabled="config.disableCTA"
+                                    ng-focus="bgCustomCTA=true" ng-blur="bgCustomCTA=false"
+                                    ng-style="bgCustomCTA ? {'background-color': config.highlight} : {}"
+                                    maxlength="40">
+                                <p class="help-block">The default "Call to Action" is <strong>I Want this Deal!</strong>. 
+                                Check the checkbox and enter a call to action that is consistent with your promotion (e.g. 
+                                <strong>Check out our new space!</strong>).</p>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-hide="promo.promogenxpathisgenericpromo">
+                            <label class="col-sm-2 control-label">Start Date*</label>
+                            <div class="col-sm-2">
+                                <md-datepicker ng-model="promo.dtpickerStartDate"></md-datepicker>
+                            </div>
+                            <div class="col-sm-2">
+                                <select class="form-control" ng-model="promo.timestart" ng-focus="bgTimeStart=true"
+                                    ng-blur="bgTimeStart=false"
+                                    ng-style="bgTimeStart ? {'background-color': config.highlight} : {}">
+                                    <option value="None">None</option>
+                                    <option value="0000">Midnight</option>
+                                    <option value="0100"> 1 am</option>
+                                    <option value="0200"> 2 am</option>
+                                    <option value="0300"> 3 am</option>
+                                    <option value="0400"> 4 am</option>
+                                    <option value="0420"> 4:20 am</option>
+                                    <option value="0500"> 5 am</option>
+                                    <option value="0600"> 6 am</option>
+                                    <option value="0700"> 7 am</option>
+                                    <option value="0800"> 8 am</option>
+                                    <option value="0900"> 9 am</option>
+                                    <option value="1000">10 am</option>
+                                    <option value="1100">11 am</option>
+                                    <option value="1200">Noon</option>
+                                    <option value="1300"> 1 pm</option>
+                                    <option value="1400"> 2 pm</option>
+                                    <option value="1500"> 3 pm</option>
+                                    <option value="1600"> 4 pm</option>
+                                    <option value="1620"> 4:20 pm</option>
+                                    <option value="1700"> 5 pm</option>
+                                    <option value="1800"> 6 pm</option>
+                                    <option value="1900"> 7 pm</option>
+                                    <option value="2000"> 8 pm</option>
+                                    <option value="2100"> 9 pm</option>
+                                    <option value="2200">10 pm</option>
+                                    <option value="2300">11 pm</option>
+                                </select>
+                                <p class="help-block">Start time (optional)</p>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-hide="promo.promogenxpathisgenericpromo">
+                            <label class="col-sm-2 control-label">End Date*</label>
+                            <div class="col-sm-2">
+                                <md-datepicker ng-model="promo.dtpickerEndDate"></md-datepicker>
+                            </div>
+                            <div class="col-sm-2">
+                                <select class="form-control" ng-model="promo.timeend" ng-focus="bgTimeEnd=true"
+                                    ng-blur="bgTimeEnd=false"
+                                    ng-style="bgTimeEnd ? {'background-color': config.highlight} : {}">
+                                    <option value="None">None</option>
+                                    <option value="0000">Midnight</option>
+                                    <option value="0100"> 1 am</option>
+                                    <option value="0200"> 2 am</option>
+                                    <option value="0300"> 3 am</option>
+                                    <option value="0400"> 4 am</option>
+                                    <option value="0420"> 4:20 am</option>
+                                    <option value="0500"> 5 am</option>
+                                    <option value="0600"> 6 am</option>
+                                    <option value="0700"> 7 am</option>
+                                    <option value="0800"> 8 am</option>
+                                    <option value="0900"> 9 am</option>
+                                    <option value="1000">10 am</option>
+                                    <option value="1100">11 am</option>
+                                    <option value="1200">Noon</option>
+                                    <option value="1300"> 1 pm</option>
+                                    <option value="1400"> 2 pm</option>
+                                    <option value="1500"> 3 pm</option>
+                                    <option value="1600"> 4 pm</option>
+                                    <option value="1620"> 4:20 pm</option>
+                                    <option value="1700"> 5 pm</option>
+                                    <option value="1800"> 6 pm</option>
+                                    <option value="1900"> 7 pm</option>
+                                    <option value="2000"> 8 pm</option>
+                                    <option value="2100"> 9 pm</option>
+                                    <option value="2200">10 pm</option>
+                                    <option value="2300">11 pm</option>
+                                </select>
+                                <p class="help-block">End time (optional)</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="myFile">Image</label>
+                            <div class="col-sm-10">
+                                <input type="file" for="myFile" file-model="myFile" ng-focus="bgFile=true"
+                                    ng-blur="bgFile=false"
+                                    ng-style="bgFile ? {'background-color': config.highlight} : {}">
+                                <p class="help-block">Upload .png, .jpg, or .tiff files</p>
+                                <p ng-show="config.isProcessing">
+                                    <small class="text-danger font-bold">Uploading and processing...</small>
+                                </p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="promo.promogencanbeshared">Promotion Sharing</label>
+                            <div class="col-sm-10">
+                                <div>
+                                    <label> 
+                                        <input type="checkbox" class="i-checks" ng-model="promo.promogencanbeshared" ng-click="clickCBA()"
+                                        ng-focus="bgClickCBA=true" ng-blur="bgClickCBA=false"
+                                        ng-style="bgClickCBA ? {'background-color': config.highlight} : {}"> 
+                                        Enable Promotion Sharing ("share it forward")
+                                    </label>
+                                </div>
+                                <p class="help-block">Enable your customers to "share it forward" and forward this promotion to a contact.</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Link</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="promo.website"
+                                    ng-focus="bgCustomLink=true" ng-blur="bgCustomLink=false"
+                                    ng-style="bgCustomLink ? {'background-color': config.highlight} : {}">
+                                <p class="help-block">Enter an optional custom link (e.g. 'http://www.google.com')
+                                    displayed to your customer</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Link Text</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="promo.linktext"
+                                    ng-focus="bgCustomLinkText=true" ng-blur="bgCustomLinkText=false"
+                                    ng-style="bgCustomLinkText ? {'background-color': config.highlight} : {}">
+                                <p class="help-block">Optionally enter text displayed as a link</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Link Description</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="promo.shortdescription"
+                                    ng-focus="bgCustomLinkDescription=true" ng-blur="bgCustomLinkDescription=false"
+                                    ng-style="bgCustomLinkDescription ? {'background-color': config.highlight} : {}">
+                                <p class="help-block">Optionally enter a link description</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-group">
+                            <div class="col-sm-10 col-sm-offset-3">
+                                <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+                                <button class="btn btn-primary" ng-click="save()">Save</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
