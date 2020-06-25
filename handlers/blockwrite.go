@@ -23,16 +23,21 @@ import (
 // BlockWrite invoke a smart contract to write a hash to the EVM log and add data file to the IPFS
 func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	var (
-		err      error
-		ok       bool
-		dcVal    interface{}
-		custid   string
-		mnfst    models.Manifest
-		reqBytes []byte
-		errMap   = make(map[string]string)
-		rspMap   = make(map[string]interface{})
-		bwMtx    sync.Mutex
+		err             error
+		ok              bool
+		dcVal           interface{}
+		custid, custref string
+		origin          string
+		mnfst           models.Manifest
+		reqBytes        []byte
+		tmpInt          = make(map[string]interface{})
+		tmpMap          = make(map[string]string)
+		errMap          = make(map[string]string)
+		rspMap          = make(map[string]interface{})
+		bwMtx           sync.Mutex
 	)
+
+	custref = "N/A"
 
 	// Get the customer document id from the gin context
 	dcVal, ok = c.Get(config.Consts["cxtCustomerIDKey"])
@@ -54,6 +59,19 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, errMap)
 	}
 
+	// Determine the origin of this request (web or api)
+	origin, err = GetGinContextValStr(c.Copy(), config.Consts["cxtRequestOrigin"])
+	if err != nil {
+		// error fetching the request body
+		log.Printf("ERROR: %v - error determining the origin of this inbound request. See: %v\n",
+			utils.FileLine(),
+			err)
+		errMap["msg"] = "error processing the request"
+
+		c.JSON(http.StatusInternalServerError, errMap)
+		return
+	}
+
 	// Fetch the request body
 	reqBytes, err = c.GetRawData()
 	if err != nil {
@@ -73,6 +91,37 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		rspMap["msg"] = "missing data - no write action"
 		c.JSON(http.StatusBadRequest, rspMap)
 		return
+	}
+
+	// Web origin request tasks
+	if origin == config.Consts["web"] {
+		// Parse the request body as json
+		err = utils.FromJSONBytes(reqBytes, &tmpMap)
+		if err != nil {
+			// error parsing the json body
+			log.Printf("ERROR: %v - error parsing the json body. See: %v\n",
+				utils.FileLine(),
+				err)
+			errMap["msg"] = "error parsing the json body"
+
+			c.JSON(http.StatusInternalServerError, errMap)
+			return
+		}
+
+		// Assign the inbound data to the manifest
+		tmpInt["title"] = tmpMap["title"]
+		tmpInt["meta_data_01"] = tmpMap["meta_data_01"]
+		tmpInt["content_text"] = tmpMap["content_text"]
+		mnfst.MetaData = tmpInt
+
+		// Store a customer reference value if provided
+		if len(tmpMap["customer_ref"]) != 0 {
+			custref = tmpMap["customer_ref"]
+			mnfst.CustomerReference = make(map[string]interface{})
+			mnfst.CustomerReference["web_customer_ref"] = custref
+		}
+
+		reqBytes = []byte(tmpMap["content_text"])
 	}
 
 	// Set up a Blake3 "hasher"
@@ -194,7 +243,7 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		0,
 		fmt.Sprintf("%x", mnsum[:32]),
 		mnfst.RequestID,
-		"N/A",
+		custref,
 	)
 	if err != nil {
 		// error calling the GoChain smart contract

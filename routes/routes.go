@@ -31,8 +31,8 @@ func initStandardRoutes(hndlr *hdl.HandlerEnv) {
 		web.GET("/getblockwrites", hndlr.WebAuth(), hndlr.GetBlockWrites)
 
 		web.POST("/login", hndlr.Login)
-		web.POST("/manualblockwrite/upload", hndlr.WebAuth(), hndlr.APIAuth(), hndlr.BlockWriteFiles)
-		web.POST("/manualblockwrite/noupload", hndlr.WebAuth(), hndlr.APIAuth(), hndlr.BlockWriteFiles)
+		web.POST("/manualblockwrite/upload", hndlr.WebAuth(), hndlr.APIAuth(), hndlr.OriginWeb(), hndlr.BlockWriteFiles)
+		web.POST("/manualblockwrite/noupload", hndlr.WebAuth(), hndlr.APIAuth(), hndlr.OriginWeb(), hndlr.BlockWrite)
 		web.POST("/logoff", hndlr.Logoff)
 
 	}
@@ -40,8 +40,8 @@ func initStandardRoutes(hndlr *hdl.HandlerEnv) {
 	apiv1 := router.Group("/api/v1")
 	{
 		apiv1.GET("/status", hndlr.Status)
-		apiv1.POST("/blockwrite", hndlr.APIAuth(), hndlr.BlockWrite)
-		apiv1.POST("/blockwritefiles", hndlr.APIAuth(), hndlr.BlockWriteFiles)
+		apiv1.POST("/blockwrite", hndlr.APIAuth(), hndlr.OriginAPI(), hndlr.BlockWrite)
+		apiv1.POST("/blockwritefiles", hndlr.APIAuth(), hndlr.OriginAPI(), hndlr.BlockWriteFiles)
 	}
 }
 

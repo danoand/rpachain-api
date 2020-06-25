@@ -193,18 +193,20 @@ function dashBlockWritesTableCtrl($http, $scope, $state, $window, sessSvc) {
       };
 
     // Call backend to validate username and password
-    $http({
-        method: 'GET',
-        url: '/webapp/getblockwrites',
-        headers: hdrs
-    }).then(function successCallback(response) {
-        $scope.gridOptions.data = response.data.content; 
-    }, function errorCallback(response) {
-        // Authentication was failed
-        console.log('ERROR: Error callback for /webapp/getblockwrites with response: ' + JSON.stringify(response));
-
-        growl.warning(response.data.msg, {ttl: 2500});
-    });
+    $scope.refreshTable = function() {
+        $http({
+            method: 'GET',
+            url: '/webapp/getblockwrites',
+            headers: hdrs
+        }).then(function successCallback(response) {
+            $scope.gridOptions.data = response.data.content; 
+        }, function errorCallback(response) {
+            // Authentication was failed
+            console.log('ERROR: Error callback for /webapp/getblockwrites with response: ' + JSON.stringify(response));
+    
+            growl.warning(response.data.msg, {ttl: 2500});
+        });
+    };
 
     // View block explorer block
     $scope.displayBlockExploreBlock = function (to_url) {
@@ -218,6 +220,9 @@ function dashBlockWritesTableCtrl($http, $scope, $state, $window, sessSvc) {
     $scope.gotoAddBlockWrite = function() {
         $state.go('app_views.blockwrite_add');
     };
+
+    // Load the page table on initial display
+    $scope.refreshTable();
 }
 
 // writeManualBlockCtrl controls the manual writing of a block
@@ -232,6 +237,7 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
     $scope.block.network      = "gochain_testnet";
     $scope.block.content_text = "";
     $scope.block.meta_data_01 = "";
+    $scope.block.customer_ref = "";
 
     // Validate validates required
     var validate = function () {
@@ -309,6 +315,12 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
         // Define the parameter inbound to the server
         var inbndData = {};
 
+        var prms = sessSvc.getUserData()
+        var hdrs = {};
+        hdrs["X-username"]      = prms.username;
+        hdrs["X-docid"]         = prms.docid;
+        hdrs["Content-Type"]    = undefined;
+
         $scope.config.isProcessing = true;
 
         // Update undefined, optional values
@@ -318,9 +330,11 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
         inbndData.network       = $scope.block.network.toString();
         inbndData.content_text  = $scope.block.content_text.toString();
         inbndData.meta_data_01  = $scope.block.meta_data_01.toString();
+        inbndData.customer_ref  = $scope.block.customer_ref.toString();
 
         $http({
             method: 'POST',
+            headers: hdrs,
             url: '/webapp/manualblockwrite/noupload',
             data: inbndData
         }).then(function successCallback(response) {

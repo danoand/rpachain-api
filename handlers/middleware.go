@@ -87,3 +87,25 @@ func (hlr *HandlerEnv) WebAuth() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+// OriginWeb is middleware that sets the gin context indicating
+//   that the request orginates from the web app
+func (hlr *HandlerEnv) OriginWeb() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Set the request origin to "web"
+		c.Set(config.Consts["cxtRequestOrigin"], config.Consts["web"])
+
+		c.Next()
+	}
+}
+
+// OriginAPI is middleware that sets the gin context indicating
+//   that the request orginates from a call to the API
+func (hlr *HandlerEnv) OriginAPI() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Set the request origin to "web"
+		c.Set(config.Consts["cxtRequestOrigin"], config.Consts["api"])
+
+		c.Next()
+	}
+}

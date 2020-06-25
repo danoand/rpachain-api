@@ -24,16 +24,20 @@ import (
 // BlockWriteFiles hashes request files and writes the manifest hash to the blockchain
 func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 	var (
-		err    error
-		ok     bool
-		dcVal  interface{}
-		custid string
-		mnfst  models.Manifest
+		err             error
+		ok              bool
+		dcVal           interface{}
+		custid, custref string
+		origin          string
+		mnfst           models.Manifest
 		// reqBytes []byte
+		tmpInt = make(map[string]interface{})
 		errMap = make(map[string]string)
 		rspMap = make(map[string]interface{})
 		bwMtx  sync.Mutex
 	)
+
+	custref = "N/A"
 
 	mnfst.MetaData = make(map[string]interface{})
 
@@ -57,6 +61,19 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, errMap)
 	}
 
+	// Determine the origin of this request (web or api)
+	origin, err = GetGinContextValStr(c.Copy(), config.Consts["cxtRequestOrigin"])
+	if err != nil {
+		// error fetching the request body
+		log.Printf("ERROR: %v - error determining the origin of this inbound request. See: %v\n",
+			utils.FileLine(),
+			err)
+		errMap["msg"] = "error processing the request"
+
+		c.JSON(http.StatusInternalServerError, errMap)
+		return
+	}
+
 	// Set up a Blake3 "hasher"
 	blk3hshr := blake3.New(256, nil)
 
@@ -76,6 +93,46 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 	// Update the hash manifest
 	mnfst.RequestID = bson.NewObjectId().Hex()
 	mnfst.TimeStamp = time.Now().In(hlr.TimeLocationCT).Format(time.RFC3339)
+
+	// Web origin request tasks
+	if origin == config.Consts["web"] {
+
+		// Grab the title value
+		if len(form.Value["title"]) != 0 && len(form.Value["title"][0]) != 0 {
+			// Get the title value
+			tmpInt["title"] = form.Value["title"][0]
+		}
+		// Grab the text content value
+		if len(form.Value["content_text"]) != 0 && len(form.Value["content_text"][0]) != 0 {
+			// Get the title value
+			tmpInt["content_text"] = form.Value["content_text"][0]
+		}
+		// Grab the meta data value
+		if len(form.Value["meta_data_01"]) != 0 && len(form.Value["meta_data_01"][0]) != 0 {
+			// Get the title value
+			tmpInt["meta_data_01"] = form.Value["meta_data_01"][0]
+		}
+		// Assign the inbound data to the manifest
+		if len(tmpInt) != 0 {
+			mnfst.MetaData = tmpInt
+		}
+
+		// Grab the customer reference value
+		if len(form.Value["customer_ref"]) != 0 && len(form.Value["customer_ref"][0]) != 0 {
+			// Get the title value
+			custref = form.Value["customer_ref"][0]
+		}
+	}
+
+	// API origin request tasks
+	if origin == config.Consts["api"] {
+
+		// Grab the customer reference value
+		if len(form.Value["customer_ref"]) != 0 && len(form.Value["customer_ref"][0]) != 0 {
+			// Get the title value
+			custref = form.Value["customer_ref"][0]
+		}
+	}
 
 	// Grab the set of files
 	files := form.File["files"]
@@ -235,7 +292,7 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 		0,
 		fmt.Sprintf("%x", mnsum[:32]),
 		mnfst.RequestID,
-		"N/A",
+		custref,
 	)
 	if err != nil {
 		// error calling the GoChain smart contract
