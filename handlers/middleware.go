@@ -79,7 +79,7 @@ func (hlr *HandlerEnv) WebAuth() gin.HandlerFunc {
 		if result["username"] != username || result["status"] != "active" {
 			// invalid or inactive account
 			c.AbortWithStatusJSON(
-				http.StatusInternalServerError,
+				http.StatusUnauthorized,
 				gin.H{"msg": "invalid or inactive account; please log in again"})
 			return
 		}

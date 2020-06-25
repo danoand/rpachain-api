@@ -31,7 +31,10 @@ func initStandardRoutes(hndlr *hdl.HandlerEnv) {
 		web.GET("/getblockwrites", hndlr.WebAuth(), hndlr.GetBlockWrites)
 
 		web.POST("/login", hndlr.Login)
+		web.POST("/manualblockwrite/upload", hndlr.WebAuth(), hndlr.APIAuth(), hndlr.BlockWriteFiles)
+		web.POST("/manualblockwrite/noupload", hndlr.WebAuth(), hndlr.APIAuth(), hndlr.BlockWriteFiles)
 		web.POST("/logoff", hndlr.Logoff)
+
 	}
 
 	apiv1 := router.Group("/api/v1")
