@@ -57,10 +57,26 @@
                 <div class="panel-body">
                     <p>View files and notarized hashes associated with the blockwrite</p>
                     <div class="list-group">
-                        <a class="list-group-item" ng-repeat="item in block.files">
+                        <li class="list-group-item" ng-repeat="item in block.files">
                             <p class="list-group-item-text"><strong>Filename</strong>: {{item.filename_display}}</p>
                             <p class="list-group-item-text"><strong>Hash</strong>: <code>{{item.hash}}</code></p>
-                        </a>
+                        </li>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="hpanel hblue">
+                <div class="panel-heading hbuilt">
+                    Notarized Blockchain Information
+                </div>
+                <div class="panel-body">
+                    <p>Listed below is the blockchain information associated with this action</p>
+                    <div class="list-group">
+                        <li class="list-group-item" ng-repeat="item in block.files">
+                            <p class="list-group-item-text"><strong>Chain Network</strong>: {{block.block_info.network}}</p>
+                            <p class="list-group-item-text"><strong>Block Number</strong>: <code>{{block.block_info.block_number}}</code> <button ng-click="displayBlockExploreBlock()" class="btn btn-xs btn-link">View on Block Explorer</button></p>
+                        </li>
                     </div>
                 </div>
             </div>

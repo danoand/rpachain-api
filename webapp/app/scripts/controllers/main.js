@@ -218,14 +218,6 @@ function dashBlockWritesTableCtrl($http, $scope, $state, $window, sessSvc) {
         });
     };
 
-    // View block explorer block
-    $scope.displayBlockExploreBlock = function (to_url) {
-        if ($scope.blockURL.length == 0) {
-            return
-        }
-        $window.open($scope.blockURL, '_blank');
-    };
-
     // View the selected block's details
     $scope.displayBlock = function() {
         $state.go('app_views.blockwrite_view', {docid: $scope.docid});
@@ -404,7 +396,7 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
 }
 
 // viewBlockCtrl controls the display of a block write's details
-function viewBlockCtrl($scope, $stateParams, $http, growl, sessSvc) {
+function viewBlockCtrl($scope, $stateParams, $http, $window, growl, sessSvc) {
     $scope.config = {};
     $scope.block  = {};
 
@@ -430,6 +422,15 @@ function viewBlockCtrl($scope, $stateParams, $http, growl, sessSvc) {
         growl.warning(response.data.msg, {ttl: 2500});
     });
 
+    // View block explorer block
+    $scope.displayBlockExploreBlock = function (to_url) {
+        console.log('DEBUG: url is:' + $scope.block.block_info.block_url)
+        if ($scope.block.block_info.block_url.length == 0) {
+            console.log('DEBUG: $scope.block.block_info.block_url is empty');
+            return
+        }
+        $window.open($scope.block.block_info.block_url, '_blank');
+    };
 }
 
 // sessSvc provides user session type services

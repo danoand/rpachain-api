@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 
+	config "github.com/danoand/rpachain-api/config"
 	mdl "github.com/danoand/rpachain-api/models"
 	"github.com/danoand/utils"
 	"github.com/gin-gonic/gin"
@@ -92,6 +94,16 @@ func (hlr *HandlerEnv) GetOneBlockWrite(c *gin.Context) {
 		// Add the array of files to the response object
 		rspMap["files"] = arrFiles
 	}
+
+	// Grab Blockchain information
+	var tMap = make(map[string]string)
+	tMap["network"] = blkWrt.ChainNetwork
+	tMap["block_number"] = blkWrt.BlockNumber
+	tMap["block_url"] = fmt.Sprintf("%v%v/%v",
+		config.Consts["gochain_testnet_explorer"],
+		"block",
+		blkWrt.BlockNumber)
+	rspMap["block_info"] = tMap
 
 	// Return the object to the client
 	rsp["msg"] = "your blockwrite"
