@@ -35,7 +35,7 @@ func (hlr *HandlerEnv) GetBlockWrites(c *gin.Context) {
 		return
 	}
 
-	// Grab all blockwrites from teh query
+	// Grab all blockwrites from the query
 	err = csr.All(context.TODO(), &blkWrts)
 	if err != nil {
 		// error accessing blockwrite data
@@ -53,6 +53,7 @@ func (hlr *HandlerEnv) GetBlockWrites(c *gin.Context) {
 		var tmpCnt = make(map[string]interface{})
 
 		// Construct a response array element
+		tmpCnt["docid"] = elm.RequestID
 		tmpCnt["network"] = elm.ChainNetwork
 		tmpCnt["timestamp"] = fmt.Sprintf("%v CST", elm.Manifest.TimeStamp[:19])
 		tmpCnt["block"] = elm.BlockNumber

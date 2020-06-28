@@ -37,9 +37,9 @@
                 <div class="pull-right"> 
                     <a class="btn btn-link btn-xs" ng-click="refreshTable()">Refresh</a>
                     <a class="btn btn-info btn-xs" ng-click="gotoAddBlockWrite()">Add to Chain</a>
-                    <a class="btn btn-primary btn-xs" ng-click="displayBlockExploreBlock()">View Block</a>
+                    <a class="btn btn-primary btn-xs" ng-click="displayBlock()">View Block</a>
                 </div>
-                Dashboard information and statistics
+                Dashboard information and statistics<span ng-show="config.refreshing"><code>Loading...</code></span>
             </div>
             <div class="panel-body">
                 <div>

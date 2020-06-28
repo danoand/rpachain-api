@@ -13,6 +13,7 @@ angular
     .controller('dashCtrl',                 dashCtrl)
     .controller('dashBlockWritesTableCtrl', dashBlockWritesTableCtrl)
     .controller('writeManualBlockCtrl',     writeManualBlockCtrl)
+    .controller('viewBlockCtrl',            viewBlockCtrl)
     .factory('sessSvc',                     sessSvc);
 
 function appCtrl($http, $scope) {};
@@ -155,7 +156,9 @@ function dashCtrl($scope, sessSvc) {
 
 // dashBlockWritesTableCtrl controls the the block write table on the dashboard view
 function dashBlockWritesTableCtrl($http, $scope, $state, $window, sessSvc) {
-    // $scope.myData = [{"name": "Tom"}, {"name": "Harry"}];
+    $scope.config = {};
+    $scope.config.refreshing = false;
+
     var prms = sessSvc.getUserData()
     var hdrs = {};
     hdrs["X-username"] = prms.username;
@@ -170,6 +173,7 @@ function dashBlockWritesTableCtrl($http, $scope, $state, $window, sessSvc) {
         multiSelect: false,
         enableRowHeaderSelection: false,
         columnDefs: [
+          { name: 'docid', enableSorting: false, visible: false },
           { name: 'network', enableSorting: true },
           { name: 'timestamp', enableSorting: true },
           { name: 'block', enableSorting: true },
@@ -187,6 +191,7 @@ function dashBlockWritesTableCtrl($http, $scope, $state, $window, sessSvc) {
             if (tmp_count == 1) {
                 selected_rows   = gridApi.selection.getSelectedRows();
                 $scope.blockURL = selected_rows[0]["explorer_link"];
+                $scope.docid    = selected_rows[0]["docid"];
             }
           });
         }
@@ -194,15 +199,20 @@ function dashBlockWritesTableCtrl($http, $scope, $state, $window, sessSvc) {
 
     // Call backend to validate username and password
     $scope.refreshTable = function() {
+        $scope.config.refreshing = true;
+
         $http({
             method: 'GET',
             url: '/webapp/getblockwrites',
             headers: hdrs
         }).then(function successCallback(response) {
+            console.log('DEBUG: in success: ' + JSON.stringify(response));
             $scope.gridOptions.data = response.data.content; 
+            $scope.config.refreshing = false;
         }, function errorCallback(response) {
             // Authentication was failed
             console.log('ERROR: Error callback for /webapp/getblockwrites with response: ' + JSON.stringify(response));
+            $scope.config.refreshing = false;
     
             growl.warning(response.data.msg, {ttl: 2500});
         });
@@ -214,6 +224,11 @@ function dashBlockWritesTableCtrl($http, $scope, $state, $window, sessSvc) {
             return
         }
         $window.open($scope.blockURL, '_blank');
+    };
+
+    // View the selected block's details
+    $scope.displayBlock = function() {
+        $state.go('app_views.blockwrite_view', {docid: $scope.docid});
     };
 
     // Display the 'Add to Chain' Form
@@ -386,6 +401,35 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
         filePost();
         return;
     };
+}
+
+// viewBlockCtrl controls the display of a block write's details
+function viewBlockCtrl($scope, $stateParams, $http, growl, sessSvc) {
+    $scope.config = {};
+    $scope.block  = {};
+
+    var prms = sessSvc.getUserData()
+    var hdrs = {};
+    hdrs["X-username"] = prms.username;
+    hdrs["X-docid"] = prms.docid;
+
+    // Grab the document id referencing the block write
+    var tmpDocid = $stateParams["docid"];
+
+    $http({
+        method: 'GET',
+        url: '/webapp/getoneblockwrite/' + tmpDocid,
+        headers: hdrs
+    }).then(function successCallback(response) {
+        console.log('DEBUG: inside viewBlockCtrl GET success branch with response:' + JSON.stringify(response));
+        $scope.block = response.data.content; 
+    }, function errorCallback(response) {
+        // Authentication was failed
+        console.log('ERROR: Error callback for /webapp/getblockwrites with response: ' + JSON.stringify(response));
+
+        growl.warning(response.data.msg, {ttl: 2500});
+    });
+
 }
 
 // sessSvc provides user session type services

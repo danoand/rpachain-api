@@ -37,11 +37,20 @@ function configState($stateProvider, $urlRouterProvider, $compileProvider) {
         })
         // (Manually) Add to the Blockchain
         .state('app_views.blockwrite_add', {
-            url: "/blockwrite_addd",
+            url: "/blockwrite_add",
             templateUrl: "views/app_views/blockwrite_manual_add.html",
             data: {
               pageTitle: 'Add to Chain',
               pageDesc: 'Notarize content and files to the Chain.'
+            }
+          })
+        // View Blockwrite details
+        .state('app_views.blockwrite_view', {
+            url: "/blockwrite_view/:docid",
+            templateUrl: "views/app_views/blockwrite_view.html",
+            data: {
+              pageTitle: 'View Blockwrite',
+              pageDesc: 'View details notarized to the Chain.'
             }
           })
 }
