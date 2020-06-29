@@ -30,6 +30,7 @@ func initStandardRoutes(hndlr *hdl.HandlerEnv) {
 
 		web.GET("/getblockwrites", hndlr.WebAuth(), hndlr.GetBlockWrites)
 		web.GET("/getoneblockwrite/:docid", hndlr.WebAuth(), hndlr.OriginWeb(), hndlr.GetOneBlockWrite)
+		web.GET("/tallyblockwritesbyday", hndlr.WebAuth(), hndlr.APIAuth(), hndlr.TallyBlockWritesByDay)
 
 		web.POST("/login", hndlr.Login)
 		web.POST("/manualblockwrite/upload", hndlr.WebAuth(), hndlr.APIAuth(), hndlr.OriginWeb(), hndlr.BlockWriteFiles)

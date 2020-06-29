@@ -109,49 +109,45 @@ function navCtrl($scope, sessSvc) {
 };
 
 // dashCtrl controls the common > dashboard view
-function dashCtrl($scope, sessSvc) {
+function dashCtrl($scope, $http, growl, sessSvc) {
 
     // Get the username from the user's session
     var sess = sessSvc.getUserData();
     $scope.accountname = sess["accountname"] || "Hello!";
+    var hdrs = {};
+    hdrs["X-username"] = sess.username;
+    hdrs["X-docid"] = sess.docid;
 
-    // Set up chart
-    $scope.labels = [
-        "March 27", 
-        "April 6", 
-        "April 13", 
-        "April 20", 
-        "April 27", 
-        "May 4", 
-        "May 11"];
-    $scope.series = ['Block Updates', 'Contract Calls'];
-    $scope.data = [
-      [65, 59, 80, 81, 56, 55, 40],
-      [28, 48, 40, 19, 86, 27, 90]
-    ];
-    $scope.onClick = function (points, evt) {
-      console.log(points, evt);
-    };
-    $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
-    $scope.options = {
-      scales: {
-        yAxes: [
-          {
-            id: 'y-axis-1',
-            type: 'linear',
-            display: true,
-            position: 'left'
-          },
-          {
-            id: 'y-axis-2',
-            type: 'linear',
-            display: true,
-            position: 'right'
-          }
-        ]
-      }
-    };
-    
+    $http({
+        method: 'GET',
+        url: '/webapp/tallyblockwritesbyday',
+        headers: hdrs
+    }).then(function successCallback(response) {
+        console.log('DEBUG: inside dashCtrl GET success branch with response:' + JSON.stringify(response));
+        $scope.content = response.data.content;
+
+        // Set up chart
+        $scope.labels = $scope.content.labels;
+        $scope.series = $scope.content.series;
+        $scope.data   = $scope.content.data;
+        $scope.onClick = function (points, evt) {
+            console.log(points, evt);
+        };
+        $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
+        $scope.options = {
+            scales: {
+                yAxes: [{
+                    id: 'y-axis-1',
+                    type: 'linear',
+                    display: true,
+                    position: 'left'
+                }]}};
+    }, function errorCallback(response) {
+        // Authentication was failed
+        console.log('ERROR: Error callback for /webapp/getblockwrites with response: ' + JSON.stringify(response));
+
+        growl.warning(response.data.msg, {ttl: 2500});
+    });
 };
 
 // dashBlockWritesTableCtrl controls the the block write table on the dashboard view
@@ -206,7 +202,6 @@ function dashBlockWritesTableCtrl($http, $scope, $state, $window, sessSvc) {
             url: '/webapp/getblockwrites',
             headers: hdrs
         }).then(function successCallback(response) {
-            console.log('DEBUG: in success: ' + JSON.stringify(response));
             $scope.gridOptions.data = response.data.content; 
             $scope.config.refreshing = false;
         }, function errorCallback(response) {
@@ -367,7 +362,6 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
     $scope.save = function () {
         // Validate the form values
         var valErr = validate();
-        console.log('DEBUG: just after the validate function with errors: ' + valErr);
         if (valErr.length > 0) {
             // Validation errors exist, notify the user
             growl.warning('Some errors are present: ' + valErr, {ttl: 2500});
@@ -379,7 +373,6 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
         growl.info('Your content is being notarized.', {ttl: 2500});
 
         // Determine if the user has selected an upload file
-        console.log('DEBUG: type of $scope.myFile is: ' + typeof $scope.myFile);
         var myFile_type = typeof $scope.myFile
         if (myFile_type == "undefined") {
             console.log('DEBUG: just inside the if statement');
@@ -389,7 +382,6 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
         }
 
         // User has selected an upload file
-        console.log('DEBUG: just before the filePost function call');
         filePost();
         return;
     };
@@ -413,7 +405,6 @@ function viewBlockCtrl($scope, $stateParams, $http, $window, growl, sessSvc) {
         url: '/webapp/getoneblockwrite/' + tmpDocid,
         headers: hdrs
     }).then(function successCallback(response) {
-        console.log('DEBUG: inside viewBlockCtrl GET success branch with response:' + JSON.stringify(response));
         $scope.block = response.data.content; 
     }, function errorCallback(response) {
         // Authentication was failed
@@ -424,7 +415,6 @@ function viewBlockCtrl($scope, $stateParams, $http, $window, growl, sessSvc) {
 
     // View block explorer block
     $scope.displayBlockExploreBlock = function (to_url) {
-        console.log('DEBUG: url is:' + $scope.block.block_info.block_url)
         if ($scope.block.block_info.block_url.length == 0) {
             console.log('DEBUG: $scope.block.block_info.block_url is empty');
             return
