@@ -255,11 +255,11 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
 
         // Check for required fields
 
-        // Title
-        if ($scope.block.title === undefined || $scope.block.title == "") {
-            errMsg.push("title is missing");
+        // Event
+        if ($scope.block.event === undefined || $scope.block.event == "") {
+            errMsg.push("event is missing");
         }
-        // Title
+        // Network
         if ($scope.block.network === undefined || $scope.block.network == "None") {
             errMsg.push("blockchain network is missing");
         }
