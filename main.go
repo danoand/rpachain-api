@@ -51,7 +51,7 @@ func main() {
 		log.Fatalf("FATAL: %v - fatal error connecting to the MongoDB database. See: %v", utils.FileLine(), err)
 	}
 
-	tmpctx, tmpcancel := context.WithTimeout(context.Background(), 5*time.Second)
+	tmpctx, tmpcancel := context.WithTimeout(context.Background(), 25*time.Second)
 	err = hndlr.Client.Ping(tmpctx, nil)
 	if err != nil {
 		log.Fatalf("FATAL: %v - fatal error pinging the MongoDB database. See: %v", utils.FileLine(), err)
