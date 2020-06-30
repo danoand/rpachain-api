@@ -84,23 +84,23 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		return
 	}
 
+	// Parse the request body as json
+	err = utils.FromJSONBytes(reqBytes, &tmpMap)
+	if err != nil {
+		// error parsing the json body
+		log.Printf("ERROR: %v - error parsing the json body. See: %v\n",
+			utils.FileLine(),
+			err)
+		errMap["msg"] = "error parsing the json body"
+
+		c.JSON(http.StatusInternalServerError, errMap)
+		return
+	}
+
 	// Web origin request tasks
 	if origin == config.Consts["web"] {
-		// Parse the request body as json
-		err = utils.FromJSONBytes(reqBytes, &tmpMap)
-		if err != nil {
-			// error parsing the json body
-			log.Printf("ERROR: %v - error parsing the json body. See: %v\n",
-				utils.FileLine(),
-				err)
-			errMap["msg"] = "error parsing the json body"
-
-			c.JSON(http.StatusInternalServerError, errMap)
-			return
-		}
-
 		// Assign the inbound data to the manifest
-		tmpInt["title"] = tmpMap["title"]
+		tmpInt["event"] = tmpMap["event"]
 		tmpInt["meta_data_01"] = tmpMap["meta_data_01"]
 		tmpInt["content_text"] = tmpMap["content_text"]
 		mnfst.MetaData = tmpInt
@@ -252,6 +252,7 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	go hlr.logblockwrite(
 		custid,
 		origin,
+		tmpMap["event"],
 		mnfst.RequestID,
 		mnfst,
 		fmt.Sprintf("0x%x", mnsum[:32]),

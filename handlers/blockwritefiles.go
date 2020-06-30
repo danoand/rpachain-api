@@ -26,7 +26,7 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 	var (
 		err             error
 		custid, custref string
-		origin          string
+		origin, event   string
 		mnfst           models.Manifest
 		// reqBytes []byte
 		tmpInt = make(map[string]interface{})
@@ -117,12 +117,18 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 
 	// API origin request tasks
 	if origin == config.Consts["api"] {
-
 		// Grab the customer reference value
 		if len(form.Value["customer_ref"]) != 0 && len(form.Value["customer_ref"][0]) != 0 {
 			// Get the title value
 			custref = form.Value["customer_ref"][0]
 		}
+	}
+
+	// Get the event description
+	event = "<none>"
+	if len(form.Value["event"]) != 0 && len(form.Value["event"][0]) != 0 {
+		// Get the title value
+		event = form.Value["event"][0]
 	}
 
 	// Grab the set of files
@@ -301,6 +307,7 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 	go hlr.logblockwrite(
 		custid,
 		origin,
+		event,
 		mnfst.RequestID,
 		mnfst,
 		fmt.Sprintf("0x%x", mnsum[:32]),

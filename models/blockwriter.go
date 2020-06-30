@@ -6,6 +6,7 @@ import "github.com/gochain/web3"
 type BlockWrite struct {
 	ID               string            `json:"id"`               // unique id
 	Source           string            `json:"source"`           // input source: 'api' or 'web'
+	Event            string            `json:"event"`            // event description
 	CustomerID       string            `json:"customerid"`       // customer id
 	ChainNetwork     string            `json:"chainnetwork"`     // blockchain network updated
 	RequestID        string            `json:"requestid"`        // api request id

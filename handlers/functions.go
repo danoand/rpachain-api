@@ -20,6 +20,7 @@ import (
 func (hlr *HandlerEnv) logblockwrite(
 	custid string,
 	source string,
+	event string,
 	reqid string,
 	mnfst models.Manifest,
 	hsh string,
@@ -41,6 +42,7 @@ func (hlr *HandlerEnv) logblockwrite(
 	obj.ID = bsn.NewObjectId().Hex()
 	obj.CustomerID = custid
 	obj.Source = source
+	obj.Event = event
 	obj.ChainNetwork = hlr.GoChainNetworkString
 	obj.ContractAddress = hlr.GoChainCntrAddrLogHash
 	obj.RequestID = reqid
