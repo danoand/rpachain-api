@@ -298,7 +298,7 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
         // Update undefined, optional values
         updUndefOptValues();
 
-        fd.append('title', $scope.block.title.toString());
+        fd.append('event', $scope.block.event.toString());
         fd.append('network', $scope.block.network.toString());
         fd.append('content', $scope.block.content.toString());
         fd.append('meta_data_01', $scope.block.meta_data_01.toString());
@@ -336,7 +336,7 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
         // Update undefined, optional values
         updUndefOptValues();
 
-        inbndData.title         = $scope.block.title.toString();
+        inbndData.event         = $scope.block.event.toString();
         inbndData.network       = $scope.block.network.toString();
         inbndData.content  = $scope.block.content.toString();
         inbndData.meta_data_01  = $scope.block.meta_data_01.toString();
