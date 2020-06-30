@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/big"
 	"net/http"
 	"sync"
 	"time"
@@ -232,7 +233,7 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		config.Cfg.GoCntrtLogAddr,
 		config.Cfg.GoChainPrivKey,
 		"postObj",
-		0,
+		big.NewInt(0),
 		fmt.Sprintf("%x", mnsum[:32]),
 		mnfst.RequestID,
 		custref,
