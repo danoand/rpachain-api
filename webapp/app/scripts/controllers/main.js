@@ -1,6 +1,6 @@
 /**
  *
- * appCtrl
+ * Application Module and Controllers
  *
  */
 
@@ -393,7 +393,7 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
 }
 
 // viewBlockCtrl controls the display of a block write's details
-function viewBlockCtrl($scope, $stateParams, $http, $window, growl, sessSvc) {
+function viewBlockCtrl($scope, $state, $stateParams, $http, $window, growl, sessSvc) {
     $scope.config = {};
     $scope.block  = {};
 
@@ -425,6 +425,11 @@ function viewBlockCtrl($scope, $stateParams, $http, $window, growl, sessSvc) {
             return
         }
         $window.open($scope.block.block_info.block_url, '_blank');
+    };
+
+    // Go to Dashboard
+    $scope.gotoDashboard = function () {
+        $state.go('dashboard');
     };
 }
 
