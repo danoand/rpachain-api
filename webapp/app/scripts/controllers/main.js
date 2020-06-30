@@ -38,7 +38,6 @@ function loginCtrl($http, $scope, $state, $cookies, growl, sessSvc) {
                 password: $scope.password
             }
         }).then(function successCallback(response) {
-            console.log(JSON.stringify(response));
             sessSvc.setUserData(response.data.content);
             growl.success(response.data.msg, {ttl: 1000});
             sessSvc.dumpUserData();
@@ -123,7 +122,6 @@ function dashCtrl($scope, $http, growl, sessSvc) {
         url: '/webapp/tallyblockwritesbyday',
         headers: hdrs
     }).then(function successCallback(response) {
-        console.log('DEBUG: inside dashCtrl GET success branch with response:' + JSON.stringify(response));
         $scope.content = response.data.content;
 
         // Set up chart
@@ -151,9 +149,10 @@ function dashCtrl($scope, $http, growl, sessSvc) {
 };
 
 // dashBlockWritesTableCtrl controls the the block write table on the dashboard view
-function dashBlockWritesTableCtrl($http, $scope, $state, $window, sessSvc) {
-    $scope.config = {};
-    $scope.config.refreshing = false;
+function dashBlockWritesTableCtrl($http, $scope, $state, growl, sessSvc) {
+    $scope.config               = {};
+    $scope.config.refreshing    = false;
+    $scope.docid                = '';
 
     var prms = sessSvc.getUserData()
     var hdrs = {};
@@ -181,6 +180,7 @@ function dashBlockWritesTableCtrl($http, $scope, $state, $window, sessSvc) {
 
           gridApi.selection.on.rowSelectionChanged($scope,function(row){
             $scope.blockURL = '';
+            $scope.docid    = '';
             selected_rows   = [];
 
             var tmp_count = gridApi.selection.getSelectedCount();
@@ -215,6 +215,11 @@ function dashBlockWritesTableCtrl($http, $scope, $state, $window, sessSvc) {
 
     // View the selected block's details
     $scope.displayBlock = function() {
+        if ($scope.docid == '') {
+            growl.warning("Please select a row.", {ttl: 2000});
+            return;
+        }
+
         $state.go('app_views.blockwrite_view', {docid: $scope.docid});
     };
 
