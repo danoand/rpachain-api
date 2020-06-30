@@ -173,13 +173,7 @@ function dashBlockWritesTableCtrl($http, $scope, $state, growl, sessSvc) {
           { name: 'docid', enableSorting: false, visible: false },
           { name: 'alert', enableSorting: false, visible: false },
           { name: 'source', enableSorting: true, width: '5%' },
-          { name: 'event', enableSorting: true, width: '45%', cellClass: function(grid, row, col, rowRenderIndex, colRenderIndex) {
-                var tmpStr = grid.getCellValue(row, col);
-                if (tmpStr.startsWith("Alert")) {
-                    return 'myCell';
-                }
-            } 
-          },
+          { name: 'event', enableSorting: true, width: '45%' },
           { name: 'network', enableSorting: true, width: '20%' },
           { name: 'timestamp', enableSorting: true, width: '20%' },
           { name: 'block', enableSorting: true, width: '10%' },
