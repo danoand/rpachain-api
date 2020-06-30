@@ -79,7 +79,7 @@ function hdrCtrl($http, $scope, $state, growl, $cookies) {
 };
 
 // navCtrl controls the common > navigation view
-function navCtrl($scope, $state, $cookies, growl, sessSvc) {
+function navCtrl($scope, $state, $http, $cookies, growl, sessSvc) {
 
     // Get the username from the user's session
     var sess = sessSvc.getUserData();
