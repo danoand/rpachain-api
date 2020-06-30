@@ -11,7 +11,8 @@ import (
 // Specification houses configuration variables sourced from environment variables
 type Specification struct {
 	IsHerokuEnv    bool   `default:"false"`
-	MGDBURLString  string `default:"mongodb+srv://dbdevuser:%v@cluster0-6uy29.mongodb.net/test?retryWrites=true&w=majority"`
+	// MGDBURLString  string `default:"mongodb+srv://dbdevuser:%v@cluster0-6uy29.mongodb.net/test?retryWrites=true&w=majority"`
+	MGDBURLString  string `default:"mongodb://dbdevuser:%v@cluster0-shard-00-00-6uy29.mongodb.net:27017,cluster0-shard-00-01-6uy29.mongodb.net:27017,cluster0-shard-00-02-6uy29.mongodb.net:27017/rpachain-dev?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority"`
 	MGDBPassword   string `required:"true"`
 	GoChainURL     string `default:"https://testnet-rpc.gochain.io/"`
 	GoChainPrivKey string `default:"0xcfa2b75c32a191e50a5612085dafac36c42e2ff6b46e110642e7ee45b916cc6b"`
