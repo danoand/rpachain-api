@@ -8,8 +8,6 @@ import (
 	"sort"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/danoand/rpachain-api/config"
 	mdl "github.com/danoand/rpachain-api/models"
 	"github.com/danoand/utils"
@@ -99,7 +97,6 @@ func (hlr *HandlerEnv) TallyBlockWritesByDay(c *gin.Context) {
 
 	// Sort the array of dates
 	sort.Strings(dteArr1)
-	spew.Dump(dteArr1)
 
 	// Iterate through the sorted array of dates and construct return elements
 	for _, elm := range dteArr1 {

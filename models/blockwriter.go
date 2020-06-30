@@ -5,6 +5,7 @@ import "github.com/gochain/web3"
 // BlockWrite models the output of block write to the blockchain
 type BlockWrite struct {
 	ID               string            `json:"id"`               // unique id
+	Source           string            `json:"source"`           // input source: 'api' or 'web'
 	CustomerID       string            `json:"customerid"`       // customer id
 	ChainNetwork     string            `json:"chainnetwork"`     // blockchain network updated
 	RequestID        string            `json:"requestid"`        // api request id

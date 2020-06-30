@@ -53,7 +53,7 @@ func (hlr *HandlerEnv) GetOneBlockWrite(c *gin.Context) {
 	}
 
 	// Construct the response object
-	rspMap["source"] = "web" // TODO: source this data element
+	rspMap["source"] = blkWrt.Source
 	rspMap["timestamp"] = blkWrt.TimeStamp
 	rspMap["request_id"] = blkWrt.RequestID
 	rspMap["config_nometadata"] = true

@@ -54,6 +54,7 @@ func (hlr *HandlerEnv) GetBlockWrites(c *gin.Context) {
 
 		// Construct a response array element
 		tmpCnt["docid"] = elm.RequestID
+		tmpCnt["source"] = elm.Source
 		tmpCnt["network"] = elm.ChainNetwork
 		tmpCnt["timestamp"] = fmt.Sprintf("%v CST", elm.Manifest.TimeStamp[:19])
 		tmpCnt["block"] = elm.BlockNumber

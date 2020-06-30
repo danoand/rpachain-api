@@ -24,8 +24,6 @@ import (
 func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	var (
 		err             error
-		ok              bool
-		dcVal           interface{}
 		custid, custref string
 		origin          string
 		mnfst           models.Manifest
@@ -40,23 +38,16 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	custref = "N/A"
 
 	// Get the customer document id from the gin context
-	dcVal, ok = c.Get(config.Consts["cxtCustomerIDKey"])
-	if !ok {
-		// missing customer document id
-		log.Printf("ERROR: %v - missing customer document id\n", utils.FileLine())
-
-		errMap["msg"] = "an error occurred"
-		c.JSON(http.StatusBadRequest, errMap)
-	}
-	custid, ok = dcVal.(string)
-	if !ok {
-		// unexpected parameter type - expecting a string
-		log.Printf("ERROR: %v - unexpected parameter type - expecting a string: %v\n",
+	custid, err = GetGinContextValStr(c.Copy(), config.Consts["cxtCustomerIDKey"])
+	if err != nil {
+		// error grabbing the customer id from the gin context
+		log.Printf("ERROR: %v - error grabbing the customer id from the gin context. See: %v\n",
 			utils.FileLine(),
-			dcVal)
+			err)
+		errMap["msg"] = "error processing the request"
 
-		errMap["msg"] = "an error occurred"
-		c.JSON(http.StatusBadRequest, errMap)
+		c.JSON(http.StatusInternalServerError, errMap)
+		return
 	}
 
 	// Determine the origin of this request (web or api)
@@ -260,6 +251,7 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	// Log blockwrite data to the database
 	go hlr.logblockwrite(
 		custid,
+		origin,
 		mnfst.RequestID,
 		mnfst,
 		fmt.Sprintf("0x%x", mnsum[:32]),
