@@ -165,15 +165,16 @@ function dashBlockWritesTableCtrl($http, $scope, $state, growl, sessSvc) {
     $scope.gridOptions = {
         showGridFooter: true,
         enableRowSelection: true,
+        enableFiltering: true,
         multiSelect: false,
         enableRowHeaderSelection: false,
         columnDefs: [
           { name: 'docid', enableSorting: false, visible: false },
-          { name: 'source', enableSorting: true },
-          { name: 'event', enableSorting: true },
-          { name: 'network', enableSorting: true },
-          { name: 'timestamp', enableSorting: true },
-          { name: 'block', enableSorting: true },
+          { name: 'source', enableSorting: true, width: '5%' },
+          { name: 'event', enableSorting: true, width: '45%' },
+          { name: 'network', enableSorting: true, width: '20%' },
+          { name: 'timestamp', enableSorting: true, width: '20%' },
+          { name: 'block', enableSorting: true, width: '10%' },
         ],
         onRegisterApi: function(gridApi) {
           $scope.gridApi = gridApi;
