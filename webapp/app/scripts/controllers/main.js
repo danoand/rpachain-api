@@ -169,11 +169,11 @@ function dashBlockWritesTableCtrl($http, $scope, $state, growl, sessSvc) {
         enableRowHeaderSelection: false,
         columnDefs: [
           { name: 'docid', enableSorting: false, visible: false },
+          { name: 'source', enableSorting: true },
+          { name: 'event', enableSorting: true },
           { name: 'network', enableSorting: true },
           { name: 'timestamp', enableSorting: true },
           { name: 'block', enableSorting: true },
-          { name: 'action', enableSorting: false },
-          { name: 'explorer_link', enableSorting: false }
         ],
         onRegisterApi: function(gridApi) {
           $scope.gridApi = gridApi;
@@ -242,7 +242,7 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
 
     $scope.block.title        = "";
     $scope.block.network      = "gochain_testnet";
-    $scope.block.content_text = "";
+    $scope.block.content = "";
     $scope.block.meta_data_01 = "";
     $scope.block.customer_ref = "";
 
@@ -268,8 +268,8 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
 
     // updUndefOptValues makes sure that undefined, optional values are set to an empty string
     var updUndefOptValues = function () {
-        if ($scope.block.content_text === undefined) {
-            $scope.block.content_text = "";
+        if ($scope.block.content === undefined) {
+            $scope.block.content = "";
         }
 
         if ($scope.block.meta_data_01 === undefined) {
@@ -297,7 +297,7 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
 
         fd.append('title', $scope.block.title.toString());
         fd.append('network', $scope.block.network.toString());
-        fd.append('content_text', $scope.block.content_text.toString());
+        fd.append('content', $scope.block.content.toString());
         fd.append('meta_data_01', $scope.block.meta_data_01.toString());
         fd.append('file', file);
 
@@ -335,7 +335,7 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
 
         inbndData.title         = $scope.block.title.toString();
         inbndData.network       = $scope.block.network.toString();
-        inbndData.content_text  = $scope.block.content_text.toString();
+        inbndData.content  = $scope.block.content.toString();
         inbndData.meta_data_01  = $scope.block.meta_data_01.toString();
         inbndData.customer_ref  = $scope.block.customer_ref.toString();
 

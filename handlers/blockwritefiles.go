@@ -94,9 +94,9 @@ func (hlr *HandlerEnv) BlockWriteFiles(c *gin.Context) {
 			tmpInt["title"] = form.Value["title"][0]
 		}
 		// Grab the text content value
-		if len(form.Value["content_text"]) != 0 && len(form.Value["content_text"][0]) != 0 {
+		if len(form.Value["content"]) != 0 && len(form.Value["content"][0]) != 0 {
 			// Get the title value
-			tmpInt["content_text"] = form.Value["content_text"][0]
+			tmpInt["content"] = form.Value["content"][0]
 		}
 		// Grab the meta data value
 		if len(form.Value["meta_data_01"]) != 0 && len(form.Value["meta_data_01"][0]) != 0 {

@@ -55,10 +55,10 @@ func (hlr *HandlerEnv) GetBlockWrites(c *gin.Context) {
 		// Construct a response array element
 		tmpCnt["docid"] = elm.RequestID
 		tmpCnt["source"] = elm.Source
+		tmpCnt["event"] = elm.Event
 		tmpCnt["network"] = elm.ChainNetwork
 		tmpCnt["timestamp"] = fmt.Sprintf("%v CST", elm.Manifest.TimeStamp[:19])
 		tmpCnt["block"] = elm.BlockNumber
-		tmpCnt["action"] = "Notarize content to the blockchain"
 		tmpCnt["explorer_link"] = fmt.Sprintf("%vblock/%v",
 			config.Consts["gochain_testnet_explorer"],
 			elm.BlockNumber)

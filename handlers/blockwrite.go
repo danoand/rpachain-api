@@ -97,12 +97,15 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		return
 	}
 
-	// Web origin request tasks
+	// Save content as bytes to be hashed below
+	reqBytes = []byte(tmpMap["content"])
+
+	// Web origin request data elements
 	if origin == config.Consts["web"] {
 		// Assign the inbound data to the manifest
 		tmpInt["event"] = tmpMap["event"]
 		tmpInt["meta_data_01"] = tmpMap["meta_data_01"]
-		tmpInt["content_text"] = tmpMap["content_text"]
+		tmpInt["content"] = tmpMap["content"]
 		mnfst.MetaData = tmpInt
 
 		// Store a customer reference value if provided
@@ -111,8 +114,6 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 			mnfst.CustomerReference = make(map[string]interface{})
 			mnfst.CustomerReference["web_customer_ref"] = custref
 		}
-
-		reqBytes = []byte(tmpMap["content_text"])
 	}
 
 	// Set up a Blake3 "hasher"
