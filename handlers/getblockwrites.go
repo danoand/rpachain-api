@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	mdl "github.com/danoand/rpachain-api/models"
 	"github.com/danoand/utils"
@@ -62,6 +63,12 @@ func (hlr *HandlerEnv) GetBlockWrites(c *gin.Context) {
 		tmpCnt["explorer_link"] = fmt.Sprintf("%vblock/%v",
 			config.Consts["gochain_testnet_explorer"],
 			elm.BlockNumber)
+
+		tmpCnt["alert"] = "none"
+		// Set "alert" to highlight rows in the client
+		if strings.Contains(strings.ToLower(elm.Event), "alert") {
+			tmpCnt["alert"] = "alert"
+		}
 
 		// Add element to the response
 		tmpCntArr = append(tmpCntArr, tmpCnt)

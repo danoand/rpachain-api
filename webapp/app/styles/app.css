@@ -2,3 +2,7 @@
     width: 500px;
     height: 250px;
   }
+
+.myCell { 
+  background-color: lemonchiffon !important; 
+}

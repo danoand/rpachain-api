@@ -158,6 +158,7 @@ function dashBlockWritesTableCtrl($http, $scope, $state, growl, sessSvc) {
     var hdrs = {};
     hdrs["X-username"] = prms.username;
     hdrs["X-docid"] = prms.docid;
+
     var selected_rows = [];
 
     $scope.blockURL = '';
@@ -170,8 +171,15 @@ function dashBlockWritesTableCtrl($http, $scope, $state, growl, sessSvc) {
         enableRowHeaderSelection: false,
         columnDefs: [
           { name: 'docid', enableSorting: false, visible: false },
+          { name: 'alert', enableSorting: false, visible: false },
           { name: 'source', enableSorting: true, width: '5%' },
-          { name: 'event', enableSorting: true, width: '45%' },
+          { name: 'event', enableSorting: true, width: '45%', cellClass: function(grid, row, col, rowRenderIndex, colRenderIndex) {
+                var tmpStr = grid.getCellValue(row, col);
+                if (tmpStr.startsWith("Alert")) {
+                    return 'myCell';
+                }
+            } 
+          },
           { name: 'network', enableSorting: true, width: '20%' },
           { name: 'timestamp', enableSorting: true, width: '20%' },
           { name: 'block', enableSorting: true, width: '10%' },
@@ -203,7 +211,7 @@ function dashBlockWritesTableCtrl($http, $scope, $state, growl, sessSvc) {
             url: '/webapp/getblockwrites',
             headers: hdrs
         }).then(function successCallback(response) {
-            $scope.gridOptions.data = response.data.content; 
+            $scope.gridOptions.data = response.data.content;
             $scope.config.refreshing = false;
         }, function errorCallback(response) {
             // Authentication was failed
@@ -381,7 +389,6 @@ function writeManualBlockCtrl($http, $scope, $state, growl, sessSvc) {
         // Determine if the user has selected an upload file
         var myFile_type = typeof $scope.myFile
         if (myFile_type == "undefined") {
-            console.log('DEBUG: just inside the if statement');
             // No upload file selected - just post the form details (but no file upload)
             prmsPost();
             return;
