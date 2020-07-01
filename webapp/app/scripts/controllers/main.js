@@ -454,6 +454,9 @@ function sessSvc() {
         getUserData: function() {
             return sess_user;
         },
+        clearUserData: function() {
+            sess_user = {};
+        },
         dumpUserData: function() {
             console.log('DEBUG: user session data is: ' + JSON.stringify(sess_user));
         }
