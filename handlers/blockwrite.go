@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"log"
@@ -24,16 +23,19 @@ import (
 // BlockWrite invoke a smart contract to write a hash to the EVM log and add data file to the IPFS
 func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	var (
-		err             error
-		custid, custref string
-		origin          string
-		mnfst           models.Manifest
-		reqBytes        []byte
-		tmpInt          = make(map[string]interface{})
-		tmpMap          = make(map[string]string)
-		errMap          = make(map[string]string)
-		rspMap          = make(map[string]interface{})
-		bwMtx           sync.Mutex
+		err                              error
+		custid, custref                  string
+		origin                           string
+		mnfst                            models.Manifest
+		reqBytes                         []byte
+		reqStr, reqRef                   string
+		hshReq, hshRef, hshMfst          []byte
+		hshReqStr, hshRefStr, hshMfstStr string
+		tmpInt                           = make(map[string]interface{})
+		tmpMap                           = make(map[string]string)
+		errMap                           = make(map[string]string)
+		rspMap                           = make(map[string]interface{})
+		bwMtx                            sync.Mutex
 	)
 
 	custref = "N/A"
@@ -77,7 +79,7 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		return
 	}
 
-	// Data missing?
+	// Is the request body empty?
 	if len(reqBytes) == 0 {
 		// missing request body data
 		rspMap["msg"] = "missing data - no write action"
@@ -99,7 +101,8 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 	}
 
 	// Save content as bytes to be hashed below
-	reqBytes = []byte(tmpMap["content"])
+	reqStr = tmpMap["content"]
+	reqRef = tmpMap["customer_reference"]
 
 	// Web origin request data elements
 	if origin == config.Consts["web"] {
@@ -111,17 +114,17 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 
 		// Store a customer reference value if provided
 		if len(tmpMap["customer_ref"]) != 0 {
-			custref = tmpMap["customer_ref"]
+			reqRef = tmpMap["customer_ref"]
 			mnfst.CustomerReference = make(map[string]interface{})
-			mnfst.CustomerReference["web_customer_ref"] = custref
+			mnfst.CustomerReference["web_customer_ref"] = reqRef
 		}
 	}
 
-	// Set up a Blake3 "hasher"
+	// Set up a Blake3 "hasher" object
 	blk3hshr := blake3.New(256, nil)
 
-	// Hash the request body data
-	_, err = blk3hshr.Write(reqBytes)
+	//* Hash the request content
+	_, err = blk3hshr.Write([]byte(reqStr))
 	if err != nil {
 		// error occurred hashing the request data
 		log.Printf("ERROR: %v - error occurred hashing the request data. See: %v\n",
@@ -132,14 +135,31 @@ func (hlr *HandlerEnv) BlockWrite(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, errMap)
 		return
 	}
-
-	// Create a reader from the request bytes
-	rdr := bytes.NewReader(reqBytes)
-
-	// Generate the hash value
-	hsh := blk3hshr.Sum(nil)
+	// Generate the hash value of the request body
+	hshReq = blk3hshr.Sum(nil)
 	// Grab the hex representation of the first 32 bytes
-	hshStr := fmt.Sprintf("%x", hsh[:32])
+	hshReqStr = fmt.Sprintf("%x", hshReq[:32])
+	// Reset the hashing object (to hash another chunk of content)
+	blk3hshr.Reset()
+
+	//* Hash the customer reference value
+	if len(reqRef) != 0 {
+		_, err = blk3hshr.Write([]byte(reqRef))
+		if err != nil {
+			// error occurred hashing the customer reference value
+			log.Printf("ERROR: %v - error occurred hashing customer reference value. See: %v\n",
+				utils.FileLine(),
+				err)
+			errMap["msg"] = "error occurred processing customer reference value"
+
+			c.JSON(http.StatusInternalServerError, errMap)
+			return
+		}
+		// Grab the hex representation of the first 32 bytes
+		hshReqStr = fmt.Sprintf("%x", hshReq[:32])
+		// Reset the hashing object (to hash another chunk of content)
+		blk3hshr.Reset()
+	}
 
 	// Update the hash manifest
 	mnfst.RequestID = bson.NewObjectId().Hex()
